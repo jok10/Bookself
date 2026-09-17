@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository //Segir spring að þetta se "Data Access Component"
 public interface UserRepository extends JpaRepository<User, Long> {
-
+    //innbyggt er findById Save og ýmislegt annað
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
     boolean existsByUsername(String username); //Til að athuga hvort að þetta usedrname sé í notkun
