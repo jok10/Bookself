@@ -3,7 +3,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tools.jackson.databind.deser.impl.NullsAsEmptyProvider;
 
 @Entity // Segir spring þetta sé klasi í SQL database.
 @Table(name = "users") //Til að segja að hér eru users geymdir. Má ekki vera user því það er reserved heiti
@@ -24,12 +23,22 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
     public enum Role{
         USER, ADMIN
     }
 
+    public User(String username, String email, String password, Role role){
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    public boolean isAdmin(){
+        return Role.ADMIN.equals(this.role);
+    }
 
 }
