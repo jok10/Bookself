@@ -19,10 +19,14 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public User registerUser(String username, String email, String password){
-        if(username == null || username.isBlank() ||
-        email == null || email.isBlank()||
-        password == null || password.isBlank()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username, email, and password are required.");
+        if (username == null || username.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required.");
+        }
+        if (email == null || email.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required.");
+        }
+        if (password == null || password.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required.");
         }
 
         if(userRepository.existsByUsername(username)){
