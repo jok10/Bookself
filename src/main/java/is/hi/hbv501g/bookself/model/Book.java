@@ -25,5 +25,7 @@ public class Book {
     private String title;
     private String author;
     private String isbn;
-    private boolean read;
+    // Taka þetta út? Eða viljum við hafa?
+    // private boolean read;
+
 }
