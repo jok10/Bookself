@@ -22,6 +22,19 @@ public class AuthController {
     }
 
     // Login user
+    @PostMapping("/login")
+    public ResponseEntity<User> loginUser(
+            @RequestParam String username,
+            @RequestParam String password,
+            HttpSession session){
+
+        User user = authService.loginUser(username, password);
+
+        session.setAttribute("USER_ID", user.getId()); //Sama session-attribute og eftir skráningu.
+
+        return ResponseEntity.ok(user);
+    }
+
     // Logout user
     //Register User
     @PostMapping("/register")
