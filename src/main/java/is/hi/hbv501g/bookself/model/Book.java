@@ -46,4 +46,26 @@ public class Book {
     //cascage = CascadeType.ALL means that if a new book is added to the database the reviews are added as well. And if the book is deleted the reviews are also deleted.
     private List<Review> reviews = new ArrayList<>();
 
+
+    public Book(String title, String author, String isbn, String description, String genre){
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+        this.description = description;
+        this.genre = genre;
+    }
+
+
+    //Helper method for BookServiceImpl to calculate new avgrating based on a new review.
+    public void calculateAverageRating(){
+        if(reviews == null || reviews.isEmpty()){
+            this.avgRating = 0.0;
+            return;
+        }
+        double sum = 0.0;
+        for(Review review: reviews){
+            sum += review.getRating();
+        }
+        this.avgRating = Math.round((sum / reviews.size()) * 100.0) / 100.0; //Round to two decimal places.
+    }
 }
