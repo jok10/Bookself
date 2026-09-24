@@ -45,7 +45,7 @@ public class AuthServiceImpl implements AuthService{
         user.setPassword(password);
         user.setRole(User.Role.USER);
         userRepository.save(user);
-        return loginUser(username, password);
+        return userRepository.save(user);
     }
 
     @Override
