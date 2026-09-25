@@ -48,7 +48,7 @@ public class BookServiceImpl implements BookService {
         }
         List<Book> books = bookRepository.findAllByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(query.trim(), query.trim());
         return books;
-        //Or returns empty if no books are found. But we can also do it this way:
+        // returns empty if no books are found. But we can also do it this way and throw an exception:
         /*
         List<Book> books = bookRepository.findAllByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(query.trim(), query.trim());
 
@@ -59,5 +59,12 @@ public class BookServiceImpl implements BookService {
         return books
          */
 
+        /*
+        To implement:
+        getBooksByGenre
+        getBooksByMinRating
+        createBook
+        updateBook
+         */
     }
 }
