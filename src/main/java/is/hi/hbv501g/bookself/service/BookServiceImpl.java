@@ -63,8 +63,6 @@ public class BookServiceImpl implements BookService {
         To implement:
         getBooksByGenre
         getBooksByMinRating
-        createBook
-        updateBook
          */
     }
 }
