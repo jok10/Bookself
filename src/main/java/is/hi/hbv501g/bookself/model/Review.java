@@ -21,9 +21,14 @@ public class Review {
     @Column(nullable = false)
     private double rating;
 
-    @ManyToOne(fetch = FetchType.LAZY) //Many instances of this class point to a single instace of book. This side is the owner of the relationship.
+    @ManyToOne(fetch = FetchType.LAZY) //Many instances of this class point to a single instance of book. This side is the owner of the relationship.
     @JoinColumn(name = "book_id", nullable = false) //Book_id is the name of the column in the database.
     @JsonIgnore // tells JSON converter to skip this field when converting Review object into JSON. It prevents an infinite loop that would crash the system.
     private Book book;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
+    private User user;
 
 }

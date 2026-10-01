@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity // Segir spring þetta sé klasi í SQL database.
 @Table(name = "users") //Til að segja að hér eru users geymdir. Má ekki vera user því það er reserved heiti
 @Data //Býr til getters, setters, toString() og ýmislegt annað automatically.
@@ -29,6 +32,9 @@ public class User {
     public enum Role{
         USER, ADMIN
     }
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Review> reviews = new ArrayList<>();
 
     public User(String username, String email, String password, Role role){
         this.username = username;

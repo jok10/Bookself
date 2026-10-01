@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     //Get all reviews for a specific book
-    List<Review> findByBook(Long bookId);
+    List<Review> findByBookId(Long bookId);
 
     //Get paginated reviews for a specific book
     Page<Review> findByBookId(Long bookId, Pageable pageable);
