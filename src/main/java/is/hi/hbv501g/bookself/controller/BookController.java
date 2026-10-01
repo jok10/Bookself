@@ -35,14 +35,13 @@ public class BookController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-/*
+
     @GetMapping("/search")
     public ResponseEntity<List<Book>> searchBooks(@RequestParam("query") String query){
         List<Book> results = bookService.searchBooks(query);
         return ResponseEntity.ok(results);
     }
 
- */
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
