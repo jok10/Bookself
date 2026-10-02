@@ -36,6 +36,7 @@ public class Review {
     @JsonIgnore
     private User user;
 
+    //Helper method to check if agiven user owns this review. For permission cheks when deleting or editing review.
     public boolean isWrittenBy(User user){
         if (user == null || this.user == null) {
             return false;
