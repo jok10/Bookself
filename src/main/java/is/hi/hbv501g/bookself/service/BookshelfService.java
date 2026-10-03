@@ -10,7 +10,7 @@ import java.util.Optional;
  * + removeBookFromShelf(userId: Long, bookId: Long): Bookshelf
  */
 public interface BookshelfService {
-    Optional<Bookshelf> getUserBookshelf(Long userId);
-    void addBookToShelf(Long userId, Long bookId);
-    void removeBookFromShelf(Long userId, Long bookId);
+    Bookshelf getUserBookshelf(Long userId);
+    Bookshelf addBookToShelf(Long userId, Long bookId);
+    Bookshelf removeBookFromShelf(Long userId, Long bookId);
 }

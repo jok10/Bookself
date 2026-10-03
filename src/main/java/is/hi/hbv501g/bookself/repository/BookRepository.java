@@ -15,5 +15,4 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     boolean existsByIsbn(String isbn);
     List<Book> findAllByGenreIgnoreCase(String genre);
     List<Book> findAllByAvgRatingGreaterThanEqual(double minRating);
-
 }
