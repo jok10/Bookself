@@ -19,6 +19,9 @@ public class UserServiceImpl implements UserService { //lofar að implementa all
     public User getUserById(Long id){
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     };
+    public Iterable<User> getAllUsers() {
+        return userRepository.findAll();
+    }
     /* Implement later. Needs a check if the username or email already exists in the database.
     @Override
     public User updateUserProfile(Long id, String name, String email){
