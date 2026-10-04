@@ -41,6 +41,18 @@ public class BookshelfServiceImpl implements BookshelfService {
 
     public Bookshelf addBookToShelf(Long userId, Long bookId) {
         Bookshelf bookshelf = getUserBookshelf(userId);
+
+        //console logs until we decide on exception handling
+        if (!bookRepository.existsById(bookId)) {
+            System.out.println("Book not found");
+            return bookshelf;
+        }
+
+        if (bookshelfRepository.existsByUser_IdAndBooks_Id(userId, bookId)) {
+            System.out.println("Book is already in the user's bookshelf");
+            return bookshelf;
+        }
+
         bookRepository.findById(bookId).ifPresent(book -> {
             bookshelf.addBook(book);
             bookshelfRepository.save(bookshelf);
@@ -50,6 +62,18 @@ public class BookshelfServiceImpl implements BookshelfService {
 
     public Bookshelf removeBookFromShelf(Long userId, Long bookId) {
         Bookshelf bookshelf = getUserBookshelf(userId);
+
+        //console logs until we decide on exception handling
+        if (!bookRepository.existsById(bookId)) {
+            System.out.println("Book not found");
+            return bookshelf;
+        }
+
+        if (!bookshelfRepository.existsByUser_IdAndBooks_Id(userId, bookId)) {
+            System.out.println("Book is not in the user's bookshelf");
+            return bookshelf;
+        }
+
         bookRepository.findById(bookId).ifPresent(book -> {
             bookshelf.removeBook(book);
             bookshelfRepository.save(bookshelf);

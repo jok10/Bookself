@@ -35,6 +35,12 @@ public class UserController {
         }
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = (List<User>) userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
 //    public ResponseEntity<String> uploadProfilePic(Long userId, byte[] imageBytes) {
 //    }
 
