@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ReviewService {
     List<Review> getReviewsByBook(Long bookId);
-    Review addOrUpdateReview(Long userId, Long bookId, int rating, String text);
+    Review addOrUpdateReview(Long userId, Long bookId, double rating, String text);
 }

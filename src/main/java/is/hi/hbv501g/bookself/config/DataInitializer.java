@@ -1,6 +1,9 @@
 package is.hi.hbv501g.bookself.config;
 import is.hi.hbv501g.bookself.model.Book;
+import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.repository.BookRepository;
+import is.hi.hbv501g.bookself.repository.UserRepository;
+import is.hi.hbv501g.bookself.service.ReviewService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +13,7 @@ import java.util.ArrayList;
 public class DataInitializer {
     //Initializes data for testing purposes.
     @Bean
-    CommandLineRunner initDatabase(BookRepository bookRepository) {
+    CommandLineRunner initDatabase(BookRepository bookRepository, UserRepository userRepository, ReviewService reviewService) {
         return args -> {
             // Check if database is already populated to avoid duplicate entries on restart
             if (bookRepository.count() == 0) {
@@ -41,6 +44,24 @@ public class DataInitializer {
 
 
                 System.out.println("--- SAMPLE BOOKS SUCCESSFULLY LOADED INTO DATABASE ---");
+
+            User testUser1 = new User("user1", "email1", "password", User.Role.USER);
+            testUser1 = userRepository.save(testUser1);
+
+            User testUser2 = new User("user2", "email2", "password", User.Role.USER);
+            testUser2 = userRepository.save(testUser2);
+
+            User testUser3 = new User("user3", "email3", "password", User.Role.USER);
+            testUser3 = userRepository.save(testUser3);
+
+            System.out.println("--- SAMPLE TEST USERs LOADED ---");
+
+            reviewService.addOrUpdateReview(
+                    testUser1.getId(),
+                    book1.getId(),
+                    4.5,
+                    "An incredible journey through Middle Earth!"
+                );
             } else {
                 System.out.println("--- DATABASE ALREADY CONTAINS DATA - SKIPPING INITIALIZATION ---");
             }

@@ -8,6 +8,7 @@ import is.hi.hbv501g.bookself.repository.ReviewRepository;
 import is.hi.hbv501g.bookself.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,9 +36,8 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public Review addOrUpdateReview(Long userId, Long bookId, int rating, String text) {
-        Review reviewToSave;
-
+    @Transactional
+    public Review addOrUpdateReview(Long userId, Long bookId, double rating, String text) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
@@ -46,33 +46,43 @@ public class ReviewServiceImpl implements ReviewService{
 
         Optional<Review> existingReview = reviewRepository.findByUserIdAndBookId(userId, bookId);
 
-        if(existingReview.isPresent()){
+        Review reviewToSave;
+        if (existingReview.isPresent()) {
             reviewToSave = existingReview.get();
             reviewToSave.setRating(rating);
             reviewToSave.setReview(text);
-        }else{
+        } else {
             reviewToSave = new Review();
             reviewToSave.setUser(user);
             reviewToSave.setBook(book);
             reviewToSave.setRating(rating);
+            reviewToSave.setReview(text);
             reviewToSave.setCreatedAt(LocalDateTime.now());
         }
 
         Review savedReview = reviewRepository.save(reviewToSave);
 
-        updateBookAverageRating(book);
+        updateBookAverageRating(bookId);
         return savedReview;
     }
 
-    private void updateBookAverageRating(Book book) {
-        // Re-fetch reviews or ensure book.getReviews() is populated
-        List<Review> reviews = reviewRepository.findByBookId(book.getId());
-        book.setReviews(reviews);
+    private void updateBookAverageRating(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + bookId));
 
-        // Call the domain method on the Book entity
-        book.calculateAverageRating();
+        List<Review> reviews = reviewRepository.findByBookId(bookId);
 
-        // Persist the updated average rating
+        if (reviews.isEmpty()) {
+            book.setAvgRating(0.0);
+        } else {
+            double sum = 0.0;
+            for (Review r : reviews) {
+                sum += r.getRating();
+            }
+            double avg = sum / reviews.size();
+            book.setAvgRating(Math.round(avg * 100.0) / 100.0);
+        }
+
         bookRepository.save(book);
     }
 }
