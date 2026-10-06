@@ -7,6 +7,8 @@ import is.hi.hbv501g.bookself.repository.BookRepository;
 import is.hi.hbv501g.bookself.repository.ReviewRepository;
 import is.hi.hbv501g.bookself.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,11 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public List<Review> getReviewsByBook(Long bookId){
         return reviewRepository.findByBookId(bookId);
+    }
+
+    @Override
+    public Page<Review> getPaginatedReviews(Long bookId, int page, int size) {
+        return reviewRepository.findByBookId(bookId, PageRequest.of(page, size));
     }
 
     @Override

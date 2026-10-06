@@ -61,8 +61,15 @@ public class BookServiceImpl implements BookService {
 
         /*
         To implement:
-        getBooksByGenre
         getBooksByMinRating
          */
+    }
+
+    @Override
+    public List<Book> getBooksByGenre(String genre) {
+        if (genre == null || genre.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+        return bookRepository.findAllByGenreIgnoreCase(genre.trim());
     }
 }

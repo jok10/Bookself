@@ -4,6 +4,7 @@ import is.hi.hbv501g.bookself.dto.ReviewRequest;
 import is.hi.hbv501g.bookself.model.Review;
 import is.hi.hbv501g.bookself.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,19 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
-    //Later: get paginated reviews
+    /**
+     * GET /api/reviews/book/{bookId}/page?page=0&size=3
+     * UC20: returns reviews for a book in pages instead of all at once.
+     * page is zero-indexed, size is how many reviews per page.
+     */
+    @GetMapping("/book/{bookId}/page")
+    public ResponseEntity<Page<Review>> getPaginatedReviews(
+            @PathVariable Long bookId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size){
+        Page<Review> reviews = reviewService.getPaginatedReviews(bookId, page, size);
+        return ResponseEntity.ok(reviews);
+    }
 
     /**
      * POST /api/reviews
