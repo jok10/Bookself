@@ -54,13 +54,44 @@ public class DataInitializer {
             User testUser3 = new User("user3", "email3", "password", User.Role.USER);
             testUser3 = userRepository.save(testUser3);
 
+            User testUser4 = new User("user4", "email4", "password", User.Role.USER);
+            testUser4 = userRepository.save(testUser4);
+
+            User testUser5 = new User("user5", "email5", "password", User.Role.USER);
+            testUser5 = userRepository.save(testUser5);
+
             System.out.println("--- SAMPLE TEST USERs LOADED ---");
+
 
             reviewService.addOrUpdateReview(
                     testUser1.getId(),
                     book1.getId(),
                     4.5,
                     "An incredible journey through Middle Earth!"
+                );
+            reviewService.addOrUpdateReview(
+                    testUser2.getId(),
+                    book1.getId(),
+                    5.0,
+                    "A perfect introduction to fantasy as a genre."
+                );
+            reviewService.addOrUpdateReview(
+                    testUser3.getId(),
+                    book1.getId(),
+                    3.5,
+                    "Charming, but I prefer the darker tone of the sequels."
+                );
+            reviewService.addOrUpdateReview(
+                    testUser4.getId(),
+                    book1.getId(),
+                    4.0,
+                    "Bilbo's reluctant heroism still holds up."
+                );
+            reviewService.addOrUpdateReview(
+                    testUser5.getId(),
+                    book1.getId(),
+                    4.5,
+                    "Short, wonderful, and endlessly re-readable."
                 );
             } else {
                 System.out.println("--- DATABASE ALREADY CONTAINS DATA - SKIPPING INITIALIZATION ---");

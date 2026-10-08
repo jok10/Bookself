@@ -42,6 +42,16 @@ public class BookController {
         return ResponseEntity.ok(results);
     }
 
+    /**
+     * GET /api/books/genre?genre=Fantasy
+     * UC10: filter-a catalogue eftir flokki. Ekki case sensitive.
+     */
+    @GetMapping("/genre")
+    public ResponseEntity<List<Book>> getBooksByGenre(@RequestParam("genre") String genre){
+        List<Book> results = bookService.getBooksByGenre(genre);
+        return ResponseEntity.ok(results);
+    }
+
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
