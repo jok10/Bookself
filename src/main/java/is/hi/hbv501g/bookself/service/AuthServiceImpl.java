@@ -19,6 +19,16 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public User registerUser(String username, String email, String password){
+        return registerUserWithRole(username, email, password, User.Role.USER);
+    }
+
+    @Override
+    public User registerAdmin(String username, String email, String password){
+        return registerUserWithRole(username, email, password, User.Role.ADMIN);
+    }
+
+    @Override
+    public User registerUserWithRole(String username, String email, String password, User.Role role){
         if (username == null || username.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required.");
         }
@@ -43,7 +53,7 @@ public class AuthServiceImpl implements AuthService{
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(password);
-        user.setRole(User.Role.USER);
+        user.setRole(role);
         return userRepository.save(user);
     }
 
