@@ -69,7 +69,7 @@ public class AuthController {
        //Check if anyone is logged in
         Long currentUserId = (Long) session.getAttribute("USER_ID");
         if (currentUserId == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You must be logged in to create an admin account.");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You must be logged in as an admin to create an admin account.");
         }
 
         // Fetch the logged in user from database
