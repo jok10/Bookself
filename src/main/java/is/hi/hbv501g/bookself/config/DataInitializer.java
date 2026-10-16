@@ -60,6 +60,9 @@ public class DataInitializer {
             User testUser5 = new User("user5", "email5", "password", User.Role.USER);
             testUser5 = userRepository.save(testUser5);
 
+            User adminUser = new User("admin", "admin@bookself.is", "adminpass", User.Role.ADMIN);
+            adminUser = userRepository.save(adminUser);
+
             System.out.println("--- SAMPLE TEST USERs LOADED ---");
 
 
