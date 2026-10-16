@@ -54,7 +54,8 @@ public class ReviewController {
      * Creates a new review or updates an existing review.
      */
     @PostMapping
-    public ResponseEntity<Review> addorUpdateReview(@RequestBody ReviewRequest request, HttpSession session) {
+    public ResponseEntity<Review> addorUpdateReview(
+            @RequestBody ReviewRequest request, HttpSession session) {
         Long currentUserId = (Long) session.getAttribute("USER_ID");
         if (currentUserId == null) {
             throw new ResponseStatusException(
