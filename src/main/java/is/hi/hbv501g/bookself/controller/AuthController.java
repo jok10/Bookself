@@ -2,6 +2,7 @@ package is.hi.hbv501g.bookself.controller;
 
 import is.hi.hbv501g.bookself.dto.LoginRequest;
 import is.hi.hbv501g.bookself.dto.RegisterRequest;
+import is.hi.hbv501g.bookself.dto.UserResponseDTO;
 import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.repository.UserRepository;
 import is.hi.hbv501g.bookself.service.AuthService;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.net.URI;
 
 @RestController //This class handles HTTP endpoints and will return data directly.
 @RequestMapping("/api/auth") //Sets the base URL path for all endpoints in this class.
@@ -26,7 +29,7 @@ public class AuthController {
 
     // Login user
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(
+    public ResponseEntity<UserResponseDTO> loginUser(
             @RequestBody LoginRequest request,
             HttpSession session){
 
@@ -34,7 +37,7 @@ public class AuthController {
 
         session.setAttribute("USER_ID", user.getId()); //Sama session-attribute og eftir skráningu.
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(UserResponseDTO.responseFromEntity(user));
     }
 
     // Logout user
@@ -46,7 +49,7 @@ public class AuthController {
 
     //Register User
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(
+    public ResponseEntity<UserResponseDTO> registerUser(
             @RequestBody RegisterRequest request,
             HttpSession session){
 
@@ -54,11 +57,13 @@ public class AuthController {
 
         session.setAttribute("USER_ID", newUser.getId()); //Logga inn automatically.
 
-        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+        URI location = URI.create("api/users/" + newUser.getId());
+
+        return ResponseEntity.created(location).body(UserResponseDTO.responseFromEntity(newUser));
     }
 
     @PostMapping("/register-admin")
-    public ResponseEntity<User> registerAdmin(
+    public ResponseEntity<UserResponseDTO> registerAdmin(
             @RequestBody RegisterRequest request, HttpSession session){
        //Check if anyone is logged in
         Long currentUserId = (Long) session.getAttribute("USER_ID");
@@ -75,7 +80,9 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied. Only administrators can create admin accounts.");
         }
         User newAdmin = authService.registerAdmin(request.getUsername(), request.getEmail(), request.getPassword());
-        return new ResponseEntity<>(newAdmin, HttpStatus.CREATED);
+
+        URI location = URI.create("/api/users/" + newAdmin.getId());
+        return ResponseEntity.created(location).body(UserResponseDTO.responseFromEntity(newAdmin));
     }
 
 }
