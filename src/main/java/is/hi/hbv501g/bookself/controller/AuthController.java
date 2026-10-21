@@ -1,5 +1,7 @@
 package is.hi.hbv501g.bookself.controller;
 
+import is.hi.hbv501g.bookself.dto.LoginRequest;
+import is.hi.hbv501g.bookself.dto.RegisterRequest;
 import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.repository.UserRepository;
 import is.hi.hbv501g.bookself.service.AuthService;
@@ -7,10 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController //This class handles HTTP endpoints and will return data directly.
@@ -28,11 +27,10 @@ public class AuthController {
     // Login user
     @PostMapping("/login")
     public ResponseEntity<User> loginUser(
-            @RequestParam String username,
-            @RequestParam String password,
+            @RequestBody LoginRequest request,
             HttpSession session){
 
-        User user = authService.loginUser(username, password);
+        User user = authService.loginUser(request.getUsername(), request.getPassword());
 
         session.setAttribute("USER_ID", user.getId()); //Sama session-attribute og eftir skráningu.
 
@@ -49,12 +47,10 @@ public class AuthController {
     //Register User
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(
-            @RequestParam String username,
-            @RequestParam String email,
-            @RequestParam String password,
+            @RequestBody RegisterRequest request,
             HttpSession session){
 
-        User newUser = authService.registerUser(username, email, password);
+        User newUser = authService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
 
         session.setAttribute("USER_ID", newUser.getId()); //Logga inn automatically.
 
@@ -63,9 +59,7 @@ public class AuthController {
 
     @PostMapping("/register-admin")
     public ResponseEntity<User> registerAdmin(
-            @RequestParam String username,
-            @RequestParam String email,
-            @RequestParam String password, HttpSession session){
+            @RequestBody RegisterRequest request, HttpSession session){
        //Check if anyone is logged in
         Long currentUserId = (Long) session.getAttribute("USER_ID");
         if (currentUserId == null) {
@@ -80,7 +74,7 @@ public class AuthController {
         if (!currentUser.isAdmin()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied. Only administrators can create admin accounts.");
         }
-        User newAdmin = authService.registerAdmin(username, email, password);
+        User newAdmin = authService.registerAdmin(request.getUsername(), request.getEmail(), request.getPassword());
         return new ResponseEntity<>(newAdmin, HttpStatus.CREATED);
     }
 
