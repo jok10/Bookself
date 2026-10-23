@@ -59,7 +59,7 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Book createBook(@RequestBody BookRequest request) {
+    public ResponseEntity<BookResponseDTO> createBook(@RequestBody BookRequest request) {
         Book book = new Book();
         book.setTitle(request.getTitle());
         book.setAuthor(request.getAuthor());
@@ -68,9 +68,9 @@ public class BookController {
         book.setGenre(request.getGenre());
 
         Book saved = bookService.save(book);
-        URI loction = URI.create("/api/books/" + saved.getId());
+        URI location = URI.create("/api/books/" + saved.getId());
 
-        return ResponseEntity.created(loction).body(BookResponseDTO.fromEntity(saved));
+        return ResponseEntity.created(location).body(BookResponseDTO.fromEntity(saved));
     }
 
     /**
