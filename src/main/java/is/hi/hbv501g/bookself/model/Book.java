@@ -28,6 +28,9 @@ public class Book {
     @Column(nullable = false)
     private String author;
 
+    @Column(nullable = false)
+    private int year;
+
     @Column(nullable = false, unique = true)
     private String isbn;
 
@@ -47,9 +50,10 @@ public class Book {
     private List<Review> reviews = new ArrayList<>();
 
 
-    public Book(String title, String author, String isbn, String description, String genre){
+    public Book(String title, String author, int year, String isbn, String description, String genre){
         this.title = title;
         this.author = author;
+        this.year = year;
         this.isbn = isbn;
         this.description = description;
         this.genre = genre;

@@ -37,7 +37,7 @@ public class AuthController {
 
         session.setAttribute("USER_ID", user.getId()); //Sama session-attribute og eftir skráningu.
 
-        return ResponseEntity.ok(UserResponseDTO.responseFromEntity(user));
+        return ResponseEntity.ok(UserResponseDTO.fromFromEntity(user));
     }
 
     // Logout user
@@ -59,7 +59,7 @@ public class AuthController {
 
         URI location = URI.create("api/users/" + newUser.getId());
 
-        return ResponseEntity.created(location).body(UserResponseDTO.responseFromEntity(newUser));
+        return ResponseEntity.created(location).body(UserResponseDTO.fromFromEntity(newUser));
     }
 
     @PostMapping("/register-admin")
@@ -82,7 +82,7 @@ public class AuthController {
         User newAdmin = authService.registerAdmin(request.getUsername(), request.getEmail(), request.getPassword());
 
         URI location = URI.create("/api/users/" + newAdmin.getId());
-        return ResponseEntity.created(location).body(UserResponseDTO.responseFromEntity(newAdmin));
+        return ResponseEntity.created(location).body(UserResponseDTO.fromFromEntity(newAdmin));
     }
 
 }
