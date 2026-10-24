@@ -6,6 +6,7 @@ import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.service.BookService;
 import is.hi.hbv501g.bookself.service.BookshelfService;
 import is.hi.hbv501g.bookself.service.UserService;
+import is.hi.hbv501g.bookself.dto.UserResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,15 +28,29 @@ public class UserController {
         this.bookshelfService = bookshelfService;
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<User> getProfile(@PathVariable Long userId) {
-        User user = userService.getUserById(userId);
-        if (user != null) {
-            return ResponseEntity.ok(user);
+//    @GetMapping("/{userId}")
+//    public ResponseEntity<User> getProfile(@PathVariable Long userId) {
+//        User user = userService.getUserById(userId);
+//        if (user != null) {
+//            return ResponseEntity.ok(user);
+//        }
+//        else {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserResponseDTO> getProfile(HttpSession session) {
+        Long currentUserId = (Long) session.getAttribute("USER_ID");
+        if (currentUserId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "You must be logged in.");
         }
-        else {
-            return ResponseEntity.notFound().build();
-        }
+
+        User user = userService.getUserById(currentUserId);
+        return ResponseEntity.ok(
+                UserResponseDTO.fromFromEntity(user));
     }
 
     @GetMapping("/all")
