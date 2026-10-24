@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService { //lofar að implementa all
     public Iterable<User> getAllUsers() {
         return userRepository.findAll();
     }
-    /* Implement later. Needs a check if the username or email already exists in the database.
+    // Implement later. Needs a check if the username or email already exists in the database.
     @Override
     public User updateUserProfile(Long id, String name, String email){
         User user = getUserById(id);
@@ -31,7 +31,6 @@ public class UserServiceImpl implements UserService { //lofar að implementa all
         return userRepository.save(user);
     };
 
-    */
     /* Implement later
     String updateProfilePicture(Long id, byte[] imageBytes);
      */
