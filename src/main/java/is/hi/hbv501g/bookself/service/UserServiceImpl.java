@@ -10,26 +10,47 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService { //lofar að implementa allt sem að er í userService
     private final UserRepository userRepository; //unchangeable
 
-    @Autowired // segir spring að finna UserRepo og setja það inn í þennan constructor strax í byrjun
-    public UserServiceImpl(UserRepository userRepository){
+    @Autowired
+    // segir spring að finna UserRepo og setja það inn í þennan constructor strax í byrjun
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
-    public User getUserById(Long id){
+    public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
-    };
+    }
+
+    ;
+
     public Iterable<User> getAllUsers() {
         return userRepository.findAll();
     }
-    // Implement later. Needs a check if the username or email already exists in the database.
+
     @Override
-    public User updateUserProfile(Long id, String name, String email){
+    public User updateUserProfile(Long id, String username, String email) {
         User user = getUserById(id);
-        user.setUsername(name);
+
+        userRepository.findByUsername(username)
+                .ifPresent(existingUser -> {
+                    if (!existingUser.getId().equals(id)) {
+                        throw new RuntimeException("Username already exists, please choose another one.");
+                    }
+                });
+
+        userRepository.findByEmail(email)
+                .ifPresent(existingUser -> {
+                    if (!existingUser.getId().equals(id)) {
+                        throw new RuntimeException("There is already an account with this e-mail.");
+                    }
+                });
+
+        user.setUsername(username);
         user.setEmail(email);
         return userRepository.save(user);
-    };
+    }
+
+    ;
 
     @Override
     public void deleteUserAccount(Long id) {
