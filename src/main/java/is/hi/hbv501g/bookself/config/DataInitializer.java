@@ -17,17 +17,17 @@ public class DataInitializer {
         return args -> {
             // Check if database is already populated to avoid duplicate entries on restart
             if (bookRepository.count() == 0) {
-                Book book1 = new Book(null, "The Hobbit", "J.R.R. Tolkien", "9780547928227", "Description", "Fantasy", 0.0, new ArrayList<>());
-                Book book2 = new Book(null, "The Lord of the Rings", "J.R.R. Tolkien", "9780618640157", "Description", "Fantasy", 0.0, new ArrayList<>());
-                Book book3 = new Book(null, "Pride and Prejudice", "Jane Austen", "9780141439518", "Description",  "Romance", 0.0, new ArrayList<>());
-                Book book4 = new Book(null, "To Kill a Mockingbird", "Harper Lee", "9780061120084", "Description", "Fiction", 0.0, new ArrayList<>());
-                Book book5 = new Book(null, "The Great Gatsby", "F. Scott Fitzgerald", "9780743273565","Description",  "Classic", 0.0, new ArrayList<>());
-                Book book6 = new Book(null, "The Shining", "Stephen King", "9780307743657", "Description", "Horror", 0.0, new ArrayList<>());
-                Book book7 = new Book(null, "Misery", "Stephen King", "9781501143106", "Description","Thriller", 0.0, new ArrayList<>());
-                Book book8 = new Book(null, "The King of Torts", "John Grisham", "9780345531988", "Description","Legal Thriller", 0.0, new ArrayList<>());
-                Book book9 = new Book(null, "Demon Copperhead", "Barbara Kingsolver", "9780063251922", "Description","Fiction", 0.0, new ArrayList<>());
-                Book book10 = new Book(null, "The Return of the King", "J.R.R. Tolkien", "9780544003415", "Description","Fantasy", 0.0, new ArrayList<>());
-                Book book11 = new Book(null, "The King's Way", "Stephen King", "9781476727653", "Description", "Horror", 0.0, new ArrayList<>());
+                Book book1 = new Book(null, "The Hobbit", "J.R.R. Tolkien", 1937, "9780547928227", "Description", "Fantasy", 0.0, new ArrayList<>());
+                Book book2 = new Book(null, "The Lord of the Rings", "J.R.R. Tolkien", 1900, "9780618640157", "Description", "Fantasy", 0.0, new ArrayList<>());
+                Book book3 = new Book(null, "Pride and Prejudice", "Jane Austen", 1900,"9780141439518", "Description",  "Romance", 0.0, new ArrayList<>());
+                Book book4 = new Book(null, "To Kill a Mockingbird", "Harper Lee", 1900,"9780061120084", "Description", "Fiction", 0.0, new ArrayList<>());
+                Book book5 = new Book(null, "The Great Gatsby", "F. Scott Fitzgerald", 1900, "9780743273565","Description",  "Classic", 0.0, new ArrayList<>());
+                Book book6 = new Book(null, "The Shining", "Stephen King", 1900,"9780307743657", "Description", "Horror", 0.0, new ArrayList<>());
+                Book book7 = new Book(null, "Misery", "Stephen King", 1900,"9781501143106", "Description","Thriller", 0.0, new ArrayList<>());
+                Book book8 = new Book(null, "The King of Torts", "John Grisham", 1900,"9780345531988", "Description","Legal Thriller", 0.0, new ArrayList<>());
+                Book book9 = new Book(null, "Demon Copperhead", "Barbara Kingsolver", 1900,"9780063251922", "Description","Fiction", 0.0, new ArrayList<>());
+                Book book10 = new Book(null, "The Return of the King", "J.R.R. Tolkien", 1900,"9780544003415", "Description","Fantasy", 0.0, new ArrayList<>());
+                Book book11 = new Book(null, "The King's Way", "Stephen King", 1900,"9781476727653", "Description", "Horror", 0.0, new ArrayList<>());
 
 
                 bookRepository.save(book1);

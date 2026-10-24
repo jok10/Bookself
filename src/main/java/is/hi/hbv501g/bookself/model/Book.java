@@ -28,7 +28,7 @@ public class Book {
     @Column(nullable = false)
     private String author;
 
-    @Column(nullable = false)
+    @Column(name = "publication_year", nullable = false)
     private int year;
 
     @Column(nullable = false, unique = true)
