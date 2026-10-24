@@ -74,9 +74,22 @@ public class UserController {
 //    public ResponseEntity<String> uploadProfilePic(Long userId, byte[] imageBytes) {
 //    }
 
-//    public void deleteAccount(@PathVariable Long userId) {
-//        userService.deleteUserAccount(userId);
-//    }
+    @DeleteMapping("/profile")
+    public ResponseEntity<Void> deleteAccount(
+            HttpSession session) {
+        Long currentUserId = (Long) session.getAttribute("USER_ID");
+
+        if (currentUserId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "You must be logged in.");
+        }
+        userService.deleteUserAccount(currentUserId);
+        session.invalidate();
+        return ResponseEntity.noContent().build();
+    }
+
+
 
     @GetMapping("/bookshelf")
     public ResponseEntity<Bookshelf> getUserBookshelf(HttpSession session) {

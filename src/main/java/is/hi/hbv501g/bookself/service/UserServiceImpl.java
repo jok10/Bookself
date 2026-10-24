@@ -31,11 +31,12 @@ public class UserServiceImpl implements UserService { //lofar að implementa all
         return userRepository.save(user);
     };
 
+    @Override
+    public void deleteUserAccount(Long id) {
+        userRepository.deleteById(id);
+    }
+
     /* Implement later
     String updateProfilePicture(Long id, byte[] imageBytes);
      */
-    /* Implement later.
-    void deleteUserAccount(Long id);
-
-    */
 }

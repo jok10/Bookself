@@ -8,12 +8,13 @@ public interface UserService {
     Iterable<User> getAllUsers();
 
     User updateUserProfile(Long id, String username, String email);
-    
+
+    void deleteUserAccount(Long id);
+
     /* For later implementation
 
     String updateProfilePicture(Long id, byte[] imageBytes);
 
-    void deleteUserAccount(Long id);
 
      */
 }
