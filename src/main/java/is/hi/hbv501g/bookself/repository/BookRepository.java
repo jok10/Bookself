@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findAllByTitleContainingIgnoreCase(String title);
     List<Book> findAllByAuthorContainingIgnoreCase(String author);
+    List<Book> findAllByYear(int year);
     List<Book> findAllByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(String title, String author);
     boolean existsByIsbn(String isbn);
     List<Book> findAllByGenreIgnoreCase(String genre);

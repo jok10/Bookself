@@ -48,16 +48,6 @@ public class BookServiceImpl implements BookService {
         }
         List<Book> books = bookRepository.findAllByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(query.trim(), query.trim());
         return books;
-        // returns empty if no books are found. But we can also do it this way and throw an exception:
-        /*
-        List<Book> books = bookRepository.findAllByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCase(query.trim(), query.trim());
-
-        if (books.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No books were found matching: " + query);
-        }
-
-        return books
-         */
 
         /*
         To implement:
