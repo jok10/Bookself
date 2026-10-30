@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class BookRequest {
     private String title;
     private String author;
-    //private int year;
+    private int year;
     private String isbn;
     private String description;
     private String genre;

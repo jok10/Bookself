@@ -3,11 +3,15 @@ package is.hi.hbv501g.bookself.controller;
 import is.hi.hbv501g.bookself.dto.BookRequest;
 import is.hi.hbv501g.bookself.dto.BookResponseDTO;
 import is.hi.hbv501g.bookself.model.Book;
+import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.service.BookService;
+import is.hi.hbv501g.bookself.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
 import java.util.List;
@@ -22,10 +26,32 @@ import java.util.stream.Collectors;
 public class BookController {
 
     private final BookService bookService;
+    private final UserService userService;
 
     @Autowired
-    public BookController(BookService bookService) {
+    public BookController(BookService bookService, UserService userService) {
         this.bookService = bookService;
+        this.userService = userService;
+    }
+    private void verifyAdmin(HttpSession session) {
+
+        Long currentUserId =
+                (Long) session.getAttribute("USER_ID");
+
+        if (currentUserId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "You must be logged in.");
+        }
+
+        User currentUser =
+                userService.getUserById(currentUserId);
+
+        if (!currentUser.isAdmin()) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Admin access required.");
+        }
     }
 
     @GetMapping
@@ -59,10 +85,12 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<BookResponseDTO> createBook(@RequestBody BookRequest request) {
+    public ResponseEntity<BookResponseDTO> createBook(@RequestBody BookRequest request, HttpSession session) {
+        verifyAdmin(session);
         Book book = new Book();
         book.setTitle(request.getTitle());
         book.setAuthor(request.getAuthor());
+        book.setYear(request.getYear());
         book.setIsbn(request.getIsbn());
         book.setDescription(request.getDescription());
         book.setGenre(request.getGenre());
@@ -80,7 +108,8 @@ public class BookController {
      * @return A ResponseEntity with status 200 ok and the updated BookResponseDTO or status 404 not found if no book with given ID exists.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<BookResponseDTO> updateBook(@PathVariable Long id, @RequestBody BookRequest request) {
+    public ResponseEntity<BookResponseDTO> updateBook(@PathVariable Long id, @RequestBody BookRequest request, HttpSession session) {
+        verifyAdmin(session);
         return bookService.findById(id)
                 .map(existing -> {
             // Only update fields if the client actually provided a new value
@@ -89,6 +118,9 @@ public class BookController {
             }
             if (request.getAuthor() != null && !request.getAuthor().isBlank()) {
                 existing.setAuthor(request.getAuthor());
+            }
+            if (request.getYear() > 0) {
+                existing.setYear(request.getYear());
             }
             if (request.getIsbn() != null && !request.getIsbn().isBlank()) {
                 existing.setIsbn(request.getIsbn());
@@ -107,7 +139,8 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id, HttpSession session) {
+        verifyAdmin(session);
         bookService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
