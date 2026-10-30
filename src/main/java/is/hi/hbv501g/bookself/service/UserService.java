@@ -6,12 +6,15 @@ public interface UserService {
     User getUserById(Long id);
 
     Iterable<User> getAllUsers();
-    /* For later implementation
+
     User updateUserProfile(Long id, String username, String email);
+
+    void deleteUserAccount(Long id);
+
+    /* For later implementation
 
     String updateProfilePicture(Long id, byte[] imageBytes);
 
-    void deleteUserAccount(Long id);
 
      */
 }
