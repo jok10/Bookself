@@ -2,18 +2,22 @@ package is.hi.hbv501g.bookself.service;
 
 
 import is.hi.hbv501g.bookself.model.User;
+import is.hi.hbv501g.bookself.repository.BookshelfRepository;
 import is.hi.hbv501g.bookself.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service //Segir spring að búa til og halda utan um þennan klasa
 public class UserServiceImpl implements UserService { //lofar að implementa allt sem að er í userService
     private final UserRepository userRepository; //unchangeable
+    private final BookshelfRepository bookshelfRepository;
 
     @Autowired
     // segir spring að finna UserRepo og setja það inn í þennan constructor strax í byrjun
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, BookshelfRepository bookshelfRepository) {
         this.userRepository = userRepository;
+        this.bookshelfRepository = bookshelfRepository;
     }
 
     @Override
@@ -53,7 +57,10 @@ public class UserServiceImpl implements UserService { //lofar að implementa all
     ;
 
     @Override
+    @Transactional
     public void deleteUserAccount(Long id) {
+        // The bookshelf points at the user, so it has to be deleted first or the database blocks the delete.
+        bookshelfRepository.findByUserId(id).ifPresent(bookshelfRepository::delete);
         userRepository.deleteById(id);
     }
 
