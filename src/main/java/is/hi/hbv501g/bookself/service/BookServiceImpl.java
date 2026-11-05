@@ -64,7 +64,7 @@ public class BookServiceImpl implements BookService {
         if (request.getAuthor() != null && !request.getAuthor().isBlank()) {
             existing.setAuthor(request.getAuthor());
         }
-        if (request.getYear() > 0) {
+        if (request.getYear() != null && request.getYear()> 0) {
             existing.setYear(request.getYear());
         }
         if (request.getIsbn() != null && !request.getIsbn().isBlank()) {
