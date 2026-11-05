@@ -1,6 +1,7 @@
 package is.hi.hbv501g.bookself.controller;
 
 import is.hi.hbv501g.bookself.dto.ReviewRequest;
+import is.hi.hbv501g.bookself.dto.ReviewResponseDTO;
 import is.hi.hbv501g.bookself.model.Review;
 import is.hi.hbv501g.bookself.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,8 @@ public class ReviewController {
      */
 
     @GetMapping("/book/{bookId}")
-    public ResponseEntity<List<Review>> getReviewsByBook(@PathVariable Long bookId) {
-        List<Review> reviews = reviewService.getReviewsByBook(bookId);
+    public ResponseEntity<List<ReviewResponseDTO>> getReviewsByBook(@PathVariable Long bookId) {
+        List<ReviewResponseDTO> reviews = reviewService.getReviewsByBook(bookId);
         return ResponseEntity.ok(reviews);
     }
 
@@ -41,11 +42,11 @@ public class ReviewController {
      * page is zero-indexed, size is how many reviews per page.
      */
     @GetMapping("/book/{bookId}/page")
-    public ResponseEntity<Page<Review>> getPaginatedReviews(
+    public ResponseEntity<Page<ReviewResponseDTO>> getPaginatedReviews(
             @PathVariable Long bookId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size) {
-        Page<Review> reviews = reviewService.getPaginatedReviews(bookId, page, size);
+        Page<ReviewResponseDTO> reviews = reviewService.getPaginatedReviews(bookId, page, size);
         return ResponseEntity.ok(reviews);
     }
 
@@ -54,7 +55,7 @@ public class ReviewController {
      * Creates a new review or updates an existing review.
      */
     @PostMapping
-    public ResponseEntity<Review> addorUpdateReview(
+    public ResponseEntity<ReviewResponseDTO> addorUpdateReview(
             @RequestBody ReviewRequest request, HttpSession session) {
         Long currentUserId = (Long) session.getAttribute("USER_ID");
         if (currentUserId == null) {
@@ -62,7 +63,7 @@ public class ReviewController {
                     HttpStatus.UNAUTHORIZED,
                     "You must be logged in to write reviews.");
         }
-        Review savedReview = reviewService.addOrUpdateReview(
+        ReviewResponseDTO savedReview = reviewService.addOrUpdateReview(
                 currentUserId,
                 request.getBookId(),
                 request.getRating(),
