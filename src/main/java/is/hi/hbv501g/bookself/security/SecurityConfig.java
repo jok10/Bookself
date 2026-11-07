@@ -3,6 +3,10 @@ package is.hi.hbv501g.bookself.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -30,5 +34,18 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    @Bean
+    AuthenticationManager authenticationManager(
+            UserDetailsService users,
+            PasswordEncoder encoder) {
+
+        DaoAuthenticationProvider provider =
+                new DaoAuthenticationProvider(users);
+
+        provider.setPasswordEncoder(encoder);
+
+        return new ProviderManager(provider);
     }
 }
