@@ -7,13 +7,14 @@ import is.hi.hbv501g.bookself.service.ReviewService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.ArrayList;
 
 @Configuration
 public class DataInitializer {
     //Initializes data for testing purposes.
     @Bean
-    CommandLineRunner initDatabase(BookRepository bookRepository, UserRepository userRepository, ReviewService reviewService) {
+    CommandLineRunner initDatabase(BookRepository bookRepository, UserRepository userRepository, ReviewService reviewService, PasswordEncoder passwordEncoder) {
         return args -> {
             // Check if database is already populated to avoid duplicate entries on restart
             if (bookRepository.count() == 0) {
@@ -45,22 +46,22 @@ public class DataInitializer {
 
                 System.out.println("--- SAMPLE BOOKS SUCCESSFULLY LOADED INTO DATABASE ---");
 
-            User testUser1 = new User("user1", "email1", "password", User.Role.USER);
+            User testUser1 = new User("user1", "email1", passwordEncoder.encode("password"), User.Role.USER);
             testUser1 = userRepository.save(testUser1);
 
-            User testUser2 = new User("user2", "email2", "password", User.Role.USER);
+            User testUser2 = new User("user2", "email2", passwordEncoder.encode("password"), User.Role.USER);
             testUser2 = userRepository.save(testUser2);
 
-            User testUser3 = new User("user3", "email3", "password", User.Role.USER);
+            User testUser3 = new User("user3", "email3", passwordEncoder.encode("password"), User.Role.USER);
             testUser3 = userRepository.save(testUser3);
 
-            User testUser4 = new User("user4", "email4", "password", User.Role.USER);
+            User testUser4 = new User("user4", "email4", passwordEncoder.encode("password"), User.Role.USER);
             testUser4 = userRepository.save(testUser4);
 
-            User testUser5 = new User("user5", "email5", "password", User.Role.USER);
+            User testUser5 = new User("user5", "email5", passwordEncoder.encode("password"), User.Role.USER);
             testUser5 = userRepository.save(testUser5);
 
-            User adminUser = new User("admin", "admin@bookself.is", "adminpass", User.Role.ADMIN);
+            User adminUser = new User("admin", "admin@bookself.is", passwordEncoder.encode("adminpass"), User.Role.ADMIN);
             adminUser = userRepository.save(adminUser);
 
             System.out.println("--- SAMPLE TEST USERs LOADED ---");
