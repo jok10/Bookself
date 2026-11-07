@@ -6,10 +6,15 @@ import is.hi.hbv501g.bookself.dto.UserResponseDTO;
 import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.repository.UserRepository;
 import is.hi.hbv501g.bookself.service.AuthService;
+import is.hi.hbv501g.bookself.dto.TokenResponse;
+import is.hi.hbv501g.bookself.security.TokenService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -20,24 +25,35 @@ import java.net.URI;
 public class AuthController {
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
 
     @Autowired
-    public AuthController(AuthService authService, UserRepository userRepository){
+    public AuthController(AuthService authService, UserRepository userRepository, AuthenticationManager authenticationManager, TokenService tokenService) {
         this.authService = authService;
         this.userRepository = userRepository;
+        this.authenticationManager = authenticationManager;
+        this.tokenService = tokenService;
     }
 
     // Login user
+//    @PostMapping("/login")
+//    public ResponseEntity<UserResponseDTO> loginUser(
+//            @RequestBody LoginRequest request,
+//            HttpSession session) {
+//
+//        User user = authService.loginUser(request.getUsername(), request.getPassword());
+//
+//        session.setAttribute("USER_ID", user.getId()); //Sama session-attribute og eftir skráningu.
+//
+//        return ResponseEntity.ok(UserResponseDTO.fromFromEntity(user));
+//    }
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> loginUser(
-            @RequestBody LoginRequest request,
-            HttpSession session){
+    public TokenResponse login(@RequestBody LoginRequest request) {
 
-        User user = authService.loginUser(request.getUsername(), request.getPassword());
+        Authentication auth = authenticationManager.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(request.getUsername(), request.getPassword()));
 
-        session.setAttribute("USER_ID", user.getId()); //Sama session-attribute og eftir skráningu.
-
-        return ResponseEntity.ok(UserResponseDTO.fromFromEntity(user));
+        return new TokenResponse(tokenService.createToken(auth), 3600);
     }
 
     // Logout user
@@ -49,9 +65,7 @@ public class AuthController {
 
     //Register User
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> registerUser(
-            @RequestBody RegisterRequest request,
-            HttpSession session){
+    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody RegisterRequest request, HttpSession session) {
 
         User newUser = authService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
 
@@ -63,17 +77,15 @@ public class AuthController {
     }
 
     @PostMapping("/register-admin")
-    public ResponseEntity<UserResponseDTO> registerAdmin(
-            @RequestBody RegisterRequest request, HttpSession session){
-       //Check if anyone is logged in
+    public ResponseEntity<UserResponseDTO> registerAdmin(@RequestBody RegisterRequest request, HttpSession session) {
+        //Check if anyone is logged in
         Long currentUserId = (Long) session.getAttribute("USER_ID");
         if (currentUserId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You must be logged in as an admin to create an admin account.");
         }
 
         // Fetch the logged in user from database
-        User currentUser = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found."));
+        User currentUser = userRepository.findById(currentUserId).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found."));
 
         // Verify that logged-in user is ADMIN
         if (!currentUser.isAdmin()) {
