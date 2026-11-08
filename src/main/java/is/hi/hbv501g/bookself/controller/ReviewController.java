@@ -64,4 +64,17 @@ public class ReviewController {
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(savedReview);
     }
+
+    /**
+     * DELETE /api/reviews/{reviewId}
+     * UC14: a reader deletes their own review. Ownership is checked in
+     * ReviewServiceImpl against the authenticated caller - this is not an
+     * admin action (that's the separate UC15, not yet implemented).
+     */
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Long reviewId, @AuthenticationPrincipal UserPrincipal principal) {
+        reviewService.deleteReview(reviewId, principal.getId());
+        return ResponseEntity.noContent().build();
+    }
 }
