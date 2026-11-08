@@ -2,56 +2,33 @@ package is.hi.hbv501g.bookself.controller;
 
 import is.hi.hbv501g.bookself.dto.BookRequest;
 import is.hi.hbv501g.bookself.dto.BookResponseDTO;
-import is.hi.hbv501g.bookself.model.Book;
-import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.service.BookService;
-import is.hi.hbv501g.bookself.service.UserService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  *REST controller for managing books.
  * Utilizes DTOs for incoming requests and safe client responses.
+ * Create/update/delete are admin-only, enforced by @PreAuthorize below -
+ * SecurityConfig's filter chain already guarantees anything that isn't a
+ * GET on this path has a valid, authenticated caller before we even get
+ * here; @PreAuthorize narrows that further to admins specifically.
  */
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
 
     private final BookService bookService;
-    private final UserService userService;
 
     @Autowired
-    public BookController(BookService bookService, UserService userService) {
+    public BookController(BookService bookService) {
         this.bookService = bookService;
-        this.userService = userService;
-    }
-    private void verifyAdmin(HttpSession session) {
-
-        Long currentUserId =
-                (Long) session.getAttribute("USER_ID");
-
-        if (currentUserId == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "You must be logged in.");
-        }
-
-        User currentUser =
-                userService.getUserById(currentUserId);
-
-        if (!currentUser.isAdmin()) {
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    "Admin access required.");
-        }
     }
 
     @GetMapping
@@ -80,10 +57,10 @@ public class BookController {
     }
 
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<BookResponseDTO> createBook(@RequestBody BookRequest request, HttpSession session) {
-        verifyAdmin(session);
+    public ResponseEntity<BookResponseDTO> createBook(@RequestBody BookRequest request) {
         BookResponseDTO saved = bookService.createBook(request);
         URI location = URI.create("/api/books/" + saved.getId());
 
@@ -96,17 +73,17 @@ public class BookController {
      * @param request The BookRequest DTO that countains the details to be updated
      * @return A ResponseEntity with status 200 ok and the updated BookResponseDTO or status 404 not found if no book with given ID exists.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<BookResponseDTO> updateBook(@PathVariable Long id, @RequestBody BookRequest request, HttpSession session) {
-        verifyAdmin(session);
+    public ResponseEntity<BookResponseDTO> updateBook(@PathVariable Long id, @RequestBody BookRequest request) {
         return bookService.updateBook(id, request)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long id, HttpSession session) {
-        verifyAdmin(session);
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
