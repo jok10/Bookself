@@ -31,7 +31,7 @@ public class AuthController {
     // Login user
     @PostMapping("/login")
     public ResponseEntity<UserResponseDTO> loginUser(
-            @RequestBody LoginRequest request,
+            @Valid @RequestBody LoginRequest request,
             HttpSession session){
 
         User user = authService.loginUser(request.getUsername(), request.getPassword());
@@ -65,7 +65,7 @@ public class AuthController {
 
     @PostMapping("/register-admin")
     public ResponseEntity<UserResponseDTO> registerAdmin(
-            @RequestBody RegisterRequest request, HttpSession session){
+            @ Valid @RequestBody RegisterRequest request, HttpSession session){
        //Check if anyone is logged in
         Long currentUserId = (Long) session.getAttribute("USER_ID");
         if (currentUserId == null) {

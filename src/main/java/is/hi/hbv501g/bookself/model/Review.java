@@ -17,7 +17,7 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 1000) //Decide what the limit should be.
+    @Column(nullable = false, length = 1000)
     private String review;
 
     @Column(nullable = false)
