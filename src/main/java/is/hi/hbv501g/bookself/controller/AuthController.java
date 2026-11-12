@@ -7,6 +7,7 @@ import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.repository.UserRepository;
 import is.hi.hbv501g.bookself.service.AuthService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class AuthController {
     //Register User
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> registerUser(
-            @RequestBody RegisterRequest request,
+            @Valid @RequestBody RegisterRequest request,
             HttpSession session){
 
         User newUser = authService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
