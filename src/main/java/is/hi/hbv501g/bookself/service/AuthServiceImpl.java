@@ -4,7 +4,6 @@ import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -12,12 +11,10 @@ import org.springframework.web.server.ResponseStatusException;
 public class AuthServiceImpl implements AuthService{
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder){
+    public AuthServiceImpl(UserRepository userRepository){
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -55,7 +52,7 @@ public class AuthServiceImpl implements AuthService{
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password)); // Store the hash, never the raw password.
+        user.setPassword(password);
         user.setRole(role);
         return userRepository.save(user);
     }
@@ -72,10 +69,7 @@ public class AuthServiceImpl implements AuthService{
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password."));
 
-        // matches() hashes the submitted password with the same salt stored in
-        // user.getPassword() and compares the results - the raw password is
-        // never compared directly, and the stored value is never reversed.
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        if (!user.getPassword().equals(password)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password.");
         }
 
