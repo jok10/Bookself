@@ -2,14 +2,15 @@ package is.hi.hbv501g.bookself.controller;
 
 import is.hi.hbv501g.bookself.dto.ReviewRequest;
 import is.hi.hbv501g.bookself.dto.ReviewResponseDTO;
-import is.hi.hbv501g.bookself.security.UserPrincipal;
+import is.hi.hbv501g.bookself.model.Review;
 import is.hi.hbv501g.bookself.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -55,9 +56,15 @@ public class ReviewController {
      */
     @PostMapping
     public ResponseEntity<ReviewResponseDTO> addorUpdateReview(
-            @RequestBody ReviewRequest request, @AuthenticationPrincipal UserPrincipal principal) {
+            @RequestBody ReviewRequest request, HttpSession session) {
+        Long currentUserId = (Long) session.getAttribute("USER_ID");
+        if (currentUserId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "You must be logged in to write reviews.");
+        }
         ReviewResponseDTO savedReview = reviewService.addOrUpdateReview(
-                principal.getId(),
+                currentUserId,
                 request.getBookId(),
                 request.getRating(),
                 request.getReview()
