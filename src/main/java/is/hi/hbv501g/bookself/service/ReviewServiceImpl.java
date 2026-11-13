@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -79,6 +81,27 @@ public class ReviewServiceImpl implements ReviewService{
 
         updateBookAverageRating(bookId);
         return ReviewResponseDTO.fromEntity(savedReview);
+    }
+
+    @Override
+    @Transactional
+    public void deleteReview(Long reviewId, Long requestingUserId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Review not found with ID: " + reviewId));
+
+        User requestingUser = userRepository.findById(requestingUserId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found."));
+
+        // UC14 only covers deleting your own review - an admin deleting
+        // someone else's review is UC15, a separate (not yet built) flow.
+        if (!review.isWrittenBy(requestingUser)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only delete your own reviews.");
+        }
+
+        Long bookId = review.getBook().getId();
+        reviewRepository.delete(review);
+        updateBookAverageRating(bookId);
     }
 
     private void updateBookAverageRating(Long bookId) {
