@@ -8,6 +8,7 @@ import is.hi.hbv501g.bookself.service.BookshelfService;
 import is.hi.hbv501g.bookself.service.UserService;
 import is.hi.hbv501g.bookself.dto.UserResponseDTO;
 import is.hi.hbv501g.bookself.dto.UpdateUserRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,7 @@ public class UserController {
 
     @PutMapping("/profile")
     public ResponseEntity<UserResponseDTO> updateProfile(
-            @RequestBody UpdateUserRequest request,
+            @Valid @RequestBody UpdateUserRequest request,
             HttpSession session) {
 
         Long currentUserId =

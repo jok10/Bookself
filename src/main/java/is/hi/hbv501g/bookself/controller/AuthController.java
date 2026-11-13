@@ -9,6 +9,7 @@ import is.hi.hbv501g.bookself.service.AuthService;
 import is.hi.hbv501g.bookself.dto.TokenResponse;
 import is.hi.hbv501g.bookself.security.TokenService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,23 +37,13 @@ public class AuthController {
         this.tokenService = tokenService;
     }
 
-    // Login user
-//    @PostMapping("/login")
-//    public ResponseEntity<UserResponseDTO> loginUser(
-//            @RequestBody LoginRequest request,
-//            HttpSession session) {
-//
-//        User user = authService.loginUser(request.getUsername(), request.getPassword());
-//
-//        session.setAttribute("USER_ID", user.getId()); //Sama session-attribute og eftir skráningu.
-//
-//        return ResponseEntity.ok(UserResponseDTO.fromFromEntity(user));
-//    }
     @PostMapping("/login")
-    public TokenResponse login(@RequestBody LoginRequest request) {
-
-        Authentication auth = authenticationManager.authenticate(UsernamePasswordAuthenticationToken.unauthenticated(request.getUsername(), request.getPassword()));
-
+    public TokenResponse login(@Valid @RequestBody LoginRequest request) {
+        Authentication auth =
+                authenticationManager.authenticate(
+                        UsernamePasswordAuthenticationToken.unauthenticated(
+                                request.getUsername(),
+                                request.getPassword()));
         return new TokenResponse(tokenService.createToken(auth), 3600);
     }
 
@@ -65,7 +56,8 @@ public class AuthController {
 
     //Register User
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> registerUser(@RequestBody RegisterRequest request, HttpSession session) {
+    public ResponseEntity<UserResponseDTO> registerUser(
+            @Valid @RequestBody RegisterRequest request, HttpSession session) {
 
         User newUser = authService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
 
@@ -77,7 +69,8 @@ public class AuthController {
     }
 
     @PostMapping("/register-admin")
-    public ResponseEntity<UserResponseDTO> registerAdmin(@RequestBody RegisterRequest request, HttpSession session) {
+    public ResponseEntity<UserResponseDTO> registerAdmin(
+            @Valid @RequestBody RegisterRequest request, HttpSession session) {
         //Check if anyone is logged in
         Long currentUserId = (Long) session.getAttribute("USER_ID");
         if (currentUserId == null) {
@@ -96,5 +89,4 @@ public class AuthController {
         URI location = URI.create("/api/users/" + newAdmin.getId());
         return ResponseEntity.created(location).body(UserResponseDTO.fromFromEntity(newAdmin));
     }
-
 }

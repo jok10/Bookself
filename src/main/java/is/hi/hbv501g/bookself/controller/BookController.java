@@ -56,20 +56,18 @@ public class BookController {
 
     @GetMapping
     public List<BookResponseDTO> getAllBooks() {
-        return bookService.findAll().stream().map(BookResponseDTO::fromEntity).collect(Collectors.toList());
+        return bookService.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BookResponseDTO> getBookById(@PathVariable Long id) {
         return bookService.findById(id)
-                .map(book -> ResponseEntity.ok(BookResponseDTO.fromEntity(book)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<BookResponseDTO>> searchBooks(@RequestParam("query") String query){
-        List<BookResponseDTO> results = bookService.searchBooks(query).stream().map(BookResponseDTO::fromEntity).collect(Collectors.toList());
-        return ResponseEntity.ok(results);
+        return ResponseEntity.ok(bookService.searchBooks(query));
     }
 
     /**
@@ -78,8 +76,7 @@ public class BookController {
      */
     @GetMapping("/genre")
     public ResponseEntity<List<BookResponseDTO>> getBooksByGenre(@RequestParam("genre") String genre){
-        List<BookResponseDTO> results = bookService.getBooksByGenre(genre).stream().map(BookResponseDTO::fromEntity).collect(Collectors.toList());
-        return ResponseEntity.ok(results);
+        return ResponseEntity.ok(bookService.getBooksByGenre(genre));
     }
 
 
@@ -87,18 +84,10 @@ public class BookController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<BookResponseDTO> createBook(@RequestBody BookRequest request, HttpSession session) {
         verifyAdmin(session);
-        Book book = new Book();
-        book.setTitle(request.getTitle());
-        book.setAuthor(request.getAuthor());
-        book.setYear(request.getYear());
-        book.setIsbn(request.getIsbn());
-        book.setDescription(request.getDescription());
-        book.setGenre(request.getGenre());
-
-        Book saved = bookService.save(book);
+        BookResponseDTO saved = bookService.createBook(request);
         URI location = URI.create("/api/books/" + saved.getId());
 
-        return ResponseEntity.created(location).body(BookResponseDTO.fromEntity(saved));
+        return ResponseEntity.created(location).body(saved);
     }
 
     /**
@@ -110,31 +99,8 @@ public class BookController {
     @PutMapping("/{id}")
     public ResponseEntity<BookResponseDTO> updateBook(@PathVariable Long id, @RequestBody BookRequest request, HttpSession session) {
         verifyAdmin(session);
-        return bookService.findById(id)
-                .map(existing -> {
-            // Only update fields if the client actually provided a new value
-            if (request.getTitle() != null && !request.getTitle().isBlank()) {
-                existing.setTitle(request.getTitle());
-            }
-            if (request.getAuthor() != null && !request.getAuthor().isBlank()) {
-                existing.setAuthor(request.getAuthor());
-            }
-            if (request.getYear() > 0) {
-                existing.setYear(request.getYear());
-            }
-            if (request.getIsbn() != null && !request.getIsbn().isBlank()) {
-                existing.setIsbn(request.getIsbn());
-            }
-            if (request.getDescription() != null && !request.getDescription().isBlank()) {
-                existing.setDescription(request.getDescription());
-            }
-            if (request.getGenre() != null && !request.getGenre().isBlank()) {
-                existing.setGenre(request.getGenre());
-            }
-
-            Book updated = bookService.save(existing);
-            return ResponseEntity.ok(BookResponseDTO.fromEntity(updated));
-                })
+        return bookService.updateBook(id, request)
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
