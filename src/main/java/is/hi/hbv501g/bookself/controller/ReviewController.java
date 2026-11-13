@@ -4,6 +4,7 @@ import is.hi.hbv501g.bookself.dto.ReviewRequest;
 import is.hi.hbv501g.bookself.dto.ReviewResponseDTO;
 import is.hi.hbv501g.bookself.model.Review;
 import is.hi.hbv501g.bookself.service.ReviewService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -56,7 +57,7 @@ public class ReviewController {
      */
     @PostMapping
     public ResponseEntity<ReviewResponseDTO> addorUpdateReview(
-            @RequestBody ReviewRequest request, HttpSession session) {
+            @Valid @RequestBody ReviewRequest request, HttpSession session) {
         Long currentUserId = (Long) session.getAttribute("USER_ID");
         if (currentUserId == null) {
             throw new ResponseStatusException(

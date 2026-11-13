@@ -7,6 +7,7 @@ import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.repository.UserRepository;
 import is.hi.hbv501g.bookself.service.AuthService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class AuthController {
     // Login user
     @PostMapping("/login")
     public ResponseEntity<UserResponseDTO> loginUser(
-            @RequestBody LoginRequest request,
+            @Valid @RequestBody LoginRequest request,
             HttpSession session){
 
         User user = authService.loginUser(request.getUsername(), request.getPassword());
@@ -50,7 +51,7 @@ public class AuthController {
     //Register User
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> registerUser(
-            @RequestBody RegisterRequest request,
+            @Valid @RequestBody RegisterRequest request,
             HttpSession session){
 
         User newUser = authService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
@@ -64,7 +65,7 @@ public class AuthController {
 
     @PostMapping("/register-admin")
     public ResponseEntity<UserResponseDTO> registerAdmin(
-            @RequestBody RegisterRequest request, HttpSession session){
+            @ Valid @RequestBody RegisterRequest request, HttpSession session){
        //Check if anyone is logged in
         Long currentUserId = (Long) session.getAttribute("USER_ID");
         if (currentUserId == null) {
