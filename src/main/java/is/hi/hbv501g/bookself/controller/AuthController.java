@@ -4,11 +4,10 @@ import is.hi.hbv501g.bookself.dto.LoginRequest;
 import is.hi.hbv501g.bookself.dto.RegisterRequest;
 import is.hi.hbv501g.bookself.dto.UserResponseDTO;
 import is.hi.hbv501g.bookself.model.User;
-import is.hi.hbv501g.bookself.repository.UserRepository;
 import is.hi.hbv501g.bookself.service.AuthService;
 import is.hi.hbv501g.bookself.dto.TokenResponse;
 import is.hi.hbv501g.bookself.security.TokenService;
-import jakarta.servlet.http.HttpSession;
+import is.hi.hbv501g.bookself.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,21 +17,23 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import java.net.URI;
+
 
 @RestController //This class handles HTTP endpoints and will return data directly.
 @RequestMapping("/api/auth") //Sets the base URL path for all endpoints in this class.
 public class AuthController {
     private final AuthService authService;
-    private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
+    private final UserService userService;
 
     @Autowired
-    public AuthController(AuthService authService, UserRepository userRepository, AuthenticationManager authenticationManager, TokenService tokenService) {
+    public AuthController(AuthService authService, AuthenticationManager authenticationManager, TokenService tokenService, UserService userService) {
         this.authService = authService;
-        this.userRepository = userRepository;
+        this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
     }
@@ -49,36 +50,32 @@ public class AuthController {
 
     // Logout user
     @PostMapping("/logout")
-    public ResponseEntity<String> logoutUser(HttpSession session) {
-        session.invalidate();
+    public ResponseEntity<String> logoutUser() {
         return ResponseEntity.ok("Logged out successfully.");
     }
 
     //Register User
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> registerUser(
-            @Valid @RequestBody RegisterRequest request, HttpSession session) {
+    public TokenResponse registerUser(@Valid @RequestBody RegisterRequest request) {
 
-        User newUser = authService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
+        authService.registerUser(
+                request.getUsername(),
+                request.getEmail(),
+                request.getPassword());
 
-        session.setAttribute("USER_ID", newUser.getId()); //Logga inn automatically.
+        Authentication auth = authenticationManager.authenticate(
+                UsernamePasswordAuthenticationToken.unauthenticated(
+                        request.getUsername(),
+                        request.getPassword()));
 
-        URI location = URI.create("api/users/" + newUser.getId());
-
-        return ResponseEntity.created(location).body(UserResponseDTO.fromFromEntity(newUser));
+        return new TokenResponse(tokenService.createToken(auth), 3600);
     }
 
     @PostMapping("/register-admin")
     public ResponseEntity<UserResponseDTO> registerAdmin(
-            @Valid @RequestBody RegisterRequest request, HttpSession session) {
-        //Check if anyone is logged in
-        Long currentUserId = (Long) session.getAttribute("USER_ID");
-        if (currentUserId == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You must be logged in as an admin to create an admin account.");
-        }
-
+            @Valid @RequestBody RegisterRequest request, @AuthenticationPrincipal Jwt jwt) {
         // Fetch the logged in user from database
-        User currentUser = userRepository.findById(currentUserId).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found."));
+        User currentUser = userService.getUserByUsername(jwt.getSubject());
 
         // Verify that logged-in user is ADMIN
         if (!currentUser.isAdmin()) {
