@@ -75,7 +75,8 @@ public class AuthController {
     public ResponseEntity<UserResponseDTO> registerAdmin(
             @Valid @RequestBody RegisterRequest request, @AuthenticationPrincipal Jwt jwt) {
         // Fetch the logged in user from database
-        User currentUser = userService.getUserByUsername(jwt.getSubject());
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
 
         // Verify that logged-in user is ADMIN
         if (!currentUser.isAdmin()) {

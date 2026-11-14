@@ -35,7 +35,8 @@ public class BookController {
     }
     private void verifyAdmin(Jwt jwt) {
 
-        User currentUser = userService.getUserByUsername(jwt.getSubject());
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
 
         if (!currentUser.isAdmin()) {
             throw new ResponseStatusException(

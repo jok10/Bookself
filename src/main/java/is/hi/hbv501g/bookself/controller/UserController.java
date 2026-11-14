@@ -32,16 +32,18 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseEntity<UserResponseDTO> getProfile(
             @AuthenticationPrincipal Jwt jwt) {
-        User user = userService.getUserByUsername(jwt.getSubject());
-
+        //User user = userService.getUserByUsername(jwt.getSubject());
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
         return ResponseEntity.ok(
-                UserResponseDTO.fromFromEntity(user));
+                UserResponseDTO.fromFromEntity(currentUser));
     }
 
     @PutMapping("/profile")
     public ResponseEntity<UserResponseDTO> updateProfile(
             @Valid @RequestBody UpdateUserRequest request, @AuthenticationPrincipal Jwt jwt) {
-        User currentUser = userService.getUserByUsername(jwt.getSubject());
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
 
         User updatedUser = userService.updateUserProfile(
                 currentUser.getId(),
@@ -63,14 +65,16 @@ public class UserController {
 
     @DeleteMapping("/profile")
     public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal Jwt jwt) {
-        User currentUser = userService.getUserByUsername(jwt.getSubject());
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
         userService.deleteUserAccount(currentUser.getId());
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/bookshelf")
     public ResponseEntity<Bookshelf> getUserBookshelf(@AuthenticationPrincipal Jwt jwt) {
-        User currentUser = userService.getUserByUsername(jwt.getSubject());
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
         Bookshelf bookshelf = bookshelfService.getUserBookshelf(currentUser.getId());
         if (bookshelf != null) {
             return ResponseEntity.ok(bookshelf);
@@ -83,7 +87,8 @@ public class UserController {
     @PostMapping("/bookshelf/add")
     public ResponseEntity<Bookshelf> addBookToBookshelf(
             @RequestParam Long bookId, @AuthenticationPrincipal Jwt jwt) {
-        User currentUser = userService.getUserByUsername(jwt.getSubject());
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
 
         Bookshelf updatedBookshelf = bookshelfService.addBookToShelf(currentUser.getId(), bookId);
         return ResponseEntity.ok(updatedBookshelf);
@@ -92,7 +97,8 @@ public class UserController {
     @DeleteMapping("/bookshelf/remove")
     public ResponseEntity<Bookshelf> removeBookFromBookshelf(
             @RequestParam Long bookId, @AuthenticationPrincipal Jwt jwt) {
-        User currentUser = userService.getUserByUsername(jwt.getSubject());
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
 
         Bookshelf updatedBookshelf = bookshelfService.removeBookFromShelf(currentUser.getId(), bookId);
         //return getUserBookshelf(currentUserId);

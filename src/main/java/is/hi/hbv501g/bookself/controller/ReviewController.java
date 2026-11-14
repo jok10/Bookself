@@ -59,7 +59,9 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<ReviewResponseDTO> addorUpdateReview(
             @Valid @RequestBody ReviewRequest request, @AuthenticationPrincipal Jwt jwt) {
-        User currentUser = userService.getUserByUsername(jwt.getSubject());
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
+
         ReviewResponseDTO savedReview = reviewService.addOrUpdateReview(
                 currentUser.getId(),
                 request.getBookId(),
