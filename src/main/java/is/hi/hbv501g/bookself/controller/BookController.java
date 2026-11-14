@@ -6,16 +6,16 @@ import is.hi.hbv501g.bookself.model.Book;
 import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.service.BookService;
 import is.hi.hbv501g.bookself.service.UserService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  *REST controller for managing books.
@@ -33,19 +33,10 @@ public class BookController {
         this.bookService = bookService;
         this.userService = userService;
     }
-    private void verifyAdmin(HttpSession session) {
+    private void verifyAdmin(Jwt jwt) {
 
-        Long currentUserId =
-                (Long) session.getAttribute("USER_ID");
-
-        if (currentUserId == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "You must be logged in.");
-        }
-
-        User currentUser =
-                userService.getUserById(currentUserId);
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
 
         if (!currentUser.isAdmin()) {
             throw new ResponseStatusException(
@@ -82,8 +73,8 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<BookResponseDTO> createBook(@RequestBody BookRequest request, HttpSession session) {
-        verifyAdmin(session);
+    public ResponseEntity<BookResponseDTO> createBook(@RequestBody BookRequest request, @AuthenticationPrincipal Jwt jwt) {
+        verifyAdmin(jwt);
         BookResponseDTO saved = bookService.createBook(request);
         URI location = URI.create("/api/books/" + saved.getId());
 
@@ -97,16 +88,16 @@ public class BookController {
      * @return A ResponseEntity with status 200 ok and the updated BookResponseDTO or status 404 not found if no book with given ID exists.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<BookResponseDTO> updateBook(@PathVariable Long id, @RequestBody BookRequest request, HttpSession session) {
-        verifyAdmin(session);
+    public ResponseEntity<BookResponseDTO> updateBook(@PathVariable Long id, @RequestBody BookRequest request, @AuthenticationPrincipal Jwt jwt) {
+        verifyAdmin(jwt);
         return bookService.updateBook(id, request)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long id, HttpSession session) {
-        verifyAdmin(session);
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+        verifyAdmin(jwt);
         bookService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

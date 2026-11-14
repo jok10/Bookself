@@ -2,17 +2,17 @@ package is.hi.hbv501g.bookself.controller;
 
 import is.hi.hbv501g.bookself.dto.ReviewRequest;
 import is.hi.hbv501g.bookself.dto.ReviewResponseDTO;
-import is.hi.hbv501g.bookself.model.Review;
 import is.hi.hbv501g.bookself.service.ReviewService;
+import is.hi.hbv501g.bookself.service.UserService;
+import is.hi.hbv501g.bookself.model.User;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.web.server.ResponseStatusException;
-
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import java.util.List;
 
 @RestController
@@ -20,17 +20,18 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final UserService userService;
 
     @Autowired
-    public ReviewController(ReviewService reviewService) {
+    public ReviewController(ReviewService reviewService, UserService userService) {
         this.reviewService = reviewService;
+        this.userService = userService;
     }
 
     /**
      * GET /api/reviews/book/{bookId}
      * Retrieves all reviews of a given book
      */
-
     @GetMapping("/book/{bookId}")
     public ResponseEntity<List<ReviewResponseDTO>> getReviewsByBook(@PathVariable Long bookId) {
         List<ReviewResponseDTO> reviews = reviewService.getReviewsByBook(bookId);
@@ -57,15 +58,12 @@ public class ReviewController {
      */
     @PostMapping
     public ResponseEntity<ReviewResponseDTO> addorUpdateReview(
-            @Valid @RequestBody ReviewRequest request, HttpSession session) {
-        Long currentUserId = (Long) session.getAttribute("USER_ID");
-        if (currentUserId == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "You must be logged in to write reviews.");
-        }
+            @Valid @RequestBody ReviewRequest request, @AuthenticationPrincipal Jwt jwt) {
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
+
         ReviewResponseDTO savedReview = reviewService.addOrUpdateReview(
-                currentUserId,
+                currentUser.getId(),
                 request.getBookId(),
                 request.getRating(),
                 request.getReview()

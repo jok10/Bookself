@@ -10,11 +10,10 @@ import is.hi.hbv501g.bookself.dto.UserResponseDTO;
 import is.hi.hbv501g.bookself.dto.UpdateUserRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
 
@@ -31,34 +30,23 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<UserResponseDTO> getProfile(HttpSession session) {
-        Long currentUserId = (Long) session.getAttribute("USER_ID");
-        if (currentUserId == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "You must be logged in.");
-        }
-        User user = userService.getUserById(currentUserId);
+    public ResponseEntity<UserResponseDTO> getProfile(
+            @AuthenticationPrincipal Jwt jwt) {
+        //User user = userService.getUserByUsername(jwt.getSubject());
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
         return ResponseEntity.ok(
-                UserResponseDTO.fromFromEntity(user));
+                UserResponseDTO.fromFromEntity(currentUser));
     }
 
     @PutMapping("/profile")
     public ResponseEntity<UserResponseDTO> updateProfile(
-            @Valid @RequestBody UpdateUserRequest request,
-            HttpSession session) {
-
-        Long currentUserId =
-                (Long) session.getAttribute("USER_ID");
-
-        if (currentUserId == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "You must be logged in.");
-        }
+            @Valid @RequestBody UpdateUserRequest request, @AuthenticationPrincipal Jwt jwt) {
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
 
         User updatedUser = userService.updateUserProfile(
-                currentUserId,
+                currentUser.getId(),
                 request.getUsername(),
                 request.getEmail());
 
@@ -76,32 +64,18 @@ public class UserController {
 //    }
 
     @DeleteMapping("/profile")
-    public ResponseEntity<Void> deleteAccount(
-            HttpSession session) {
-        Long currentUserId = (Long) session.getAttribute("USER_ID");
-
-        if (currentUserId == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "You must be logged in.");
-        }
-        userService.deleteUserAccount(currentUserId);
-        session.invalidate();
+    public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal Jwt jwt) {
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
+        userService.deleteUserAccount(currentUser.getId());
         return ResponseEntity.noContent().build();
     }
 
-
-
     @GetMapping("/bookshelf")
-    public ResponseEntity<Bookshelf> getUserBookshelf(HttpSession session) {
-        Long currentUserId = (Long) session.getAttribute("USER_ID");
-
-        if (currentUserId == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "You must be logged in.");
-        }
-        Bookshelf bookshelf = bookshelfService.getUserBookshelf(currentUserId);
+    public ResponseEntity<Bookshelf> getUserBookshelf(@AuthenticationPrincipal Jwt jwt) {
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
+        Bookshelf bookshelf = bookshelfService.getUserBookshelf(currentUser.getId());
         if (bookshelf != null) {
             return ResponseEntity.ok(bookshelf);
         }
@@ -112,28 +86,21 @@ public class UserController {
 
     @PostMapping("/bookshelf/add")
     public ResponseEntity<Bookshelf> addBookToBookshelf(
-            @RequestParam Long bookId, HttpSession session) {
-        Long currentUserId = (Long) session.getAttribute("USER_ID");
-        if (currentUserId == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "You must be logged in.");
-        }
-        Bookshelf updatedBookshelf = bookshelfService.addBookToShelf(currentUserId, bookId);
+            @RequestParam Long bookId, @AuthenticationPrincipal Jwt jwt) {
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
+
+        Bookshelf updatedBookshelf = bookshelfService.addBookToShelf(currentUser.getId(), bookId);
         return ResponseEntity.ok(updatedBookshelf);
     }
 
     @DeleteMapping("/bookshelf/remove")
     public ResponseEntity<Bookshelf> removeBookFromBookshelf(
-            @RequestParam Long bookId, HttpSession session) {
-        Long currentUserId = (Long) session.getAttribute("USER_ID");
+            @RequestParam Long bookId, @AuthenticationPrincipal Jwt jwt) {
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
 
-        if (currentUserId == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED,
-                    "You must be logged in.");
-        }
-        Bookshelf updatedBookshelf = bookshelfService.removeBookFromShelf(currentUserId, bookId);
+        Bookshelf updatedBookshelf = bookshelfService.removeBookFromShelf(currentUser.getId(), bookId);
         //return getUserBookshelf(currentUserId);
         return ResponseEntity.ok(updatedBookshelf);
     }
