@@ -4,6 +4,7 @@ import is.hi.hbv501g.bookself.model.User;
 
 public interface UserService {
     User getUserById(Long id);
+    User getUserByUsername(String username);
 
     Iterable<User> getAllUsers();
 

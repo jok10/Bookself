@@ -24,8 +24,13 @@ public class UserServiceImpl implements UserService { //lofar að implementa all
     public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
-
-    ;
+    @Override
+    public User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "User not found with username: " + username));
+    }
 
     public Iterable<User> getAllUsers() {
         return userRepository.findAll();
