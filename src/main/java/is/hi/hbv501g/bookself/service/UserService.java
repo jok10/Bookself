@@ -1,6 +1,7 @@
 package is.hi.hbv501g.bookself.service;
 
 import is.hi.hbv501g.bookself.model.User;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
     User getUserById(Long id);
@@ -12,10 +13,6 @@ public interface UserService {
 
     void deleteUserAccount(Long id);
 
-    /* For later implementation
+    String updateProfilePicture(Long id, MultipartFile file); // Inngyggt í Spring Boot til þess að hlaða upp skjölum
 
-    String updateProfilePicture(Long id, byte[] imageBytes);
-
-
-     */
 }

@@ -33,6 +33,9 @@ public class User {
         USER, ADMIN
     }
 
+    @Column
+    private String profilePicURL;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
 

@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -52,6 +53,14 @@ public class UserController {
 
         return ResponseEntity.ok(
                 UserResponseDTO.fromFromEntity(updatedUser));
+    }
+    @PostMapping("/profile-picture")
+    public ResponseEntity<String> uploadProfilePicture(
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal Jwt jwt) {
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        String imageUrl = userService.updateProfilePicture(userId, file);
+        return ResponseEntity.ok(imageUrl);
     }
 
     @GetMapping("/all")
