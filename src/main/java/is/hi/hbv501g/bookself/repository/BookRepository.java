@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository for Book entities. Handles database operation for books.
+ * Repository for database operations on Books.
  */
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
