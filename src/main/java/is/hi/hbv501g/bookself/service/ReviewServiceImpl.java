@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -99,5 +101,11 @@ public class ReviewServiceImpl implements ReviewService{
         }
 
         bookRepository.save(book);
+    }
+    @Override
+    public void deleteReview (Long userId, Long bookId){
+        Review review = reviewRepository.findByUserIdAndBookId(userId, bookId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Review not found for this book"));
+        reviewRepository.delete(review);
+        updateBookAverageRating(bookId);
     }
 }

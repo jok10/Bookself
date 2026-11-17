@@ -70,4 +70,13 @@ public class ReviewController {
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(savedReview);
     }
+
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Long bookId,
+            @AuthenticationPrincipal Jwt jwt) {
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        reviewService.deleteReview(userId, bookId);
+        return ResponseEntity.noContent().build();
+    }
 }
