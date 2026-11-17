@@ -15,6 +15,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import java.util.List;
 
+/**
+ * REST controller responsible for managing book reviews.
+ * Handles viewing all reviews for a book, paginated review lists,
+ * adding/updating reviews, and deleting user reviews.
+ */
+
 @RestController
 @RequestMapping("/api/reviews")
 public class ReviewController {
@@ -28,9 +34,14 @@ public class ReviewController {
         this.userService = userService;
     }
 
+    //Get reviews
+
+
     /**
-     * GET /api/reviews/book/{bookId}
-     * Retrieves all reviews of a given book
+     * Retrieves all reviews written for a specific book.
+     *
+     * @param bookId the unique id of the book
+     * @return a list of ReviewResponseDTO objects representing the book's reviews
      */
     @GetMapping("/book/{bookId}")
     public ResponseEntity<List<ReviewResponseDTO>> getReviewsByBook(@PathVariable Long bookId) {
@@ -39,9 +50,12 @@ public class ReviewController {
     }
 
     /**
-     * GET /api/reviews/book/{bookId}/page?page=0&size=3
-     * UC20: returns reviews for a book in pages instead of all at once.
-     * page is zero-indexed, size is how many reviews per page.
+     * Retrieves a paginated list of reviews for a specific book.
+     *
+     * @param bookId the unique id of the book
+     * @param page the page number (zero-indexed, default is 0)
+     * @param size the number of reviews per page (default is 3)
+     * @return a Page of ReviewResponseDTO objects
      */
     @GetMapping("/book/{bookId}/page")
     public ResponseEntity<Page<ReviewResponseDTO>> getPaginatedReviews(
@@ -52,9 +66,15 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
+    //Review management
+
     /**
-     * POST /api/reviews
-     * Creates a new review or updates an existing review.
+     * Creates a new review or updates an existing review for a book
+     * written by the currently authenticated user (one review per user per book).
+     *
+     * @param request the review request payload containing bookId, rating, and review text
+     * @param jwt the security token of the authenticated user
+     * @return a 201 Created response containing the saved ReviewResponseDTO
      */
     @PostMapping
     public ResponseEntity<ReviewResponseDTO> addorUpdateReview(
@@ -71,7 +91,14 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedReview);
     }
 
-    @DeleteMapping("/{reviewId}")
+    /**
+     * Deletes the authenticated user's review for a specific book.
+     *
+     * @param bookId the unique identifier of the book whose review is being deleted
+     * @param jwt the security token of the authenticated user
+     * @return a 204 No Content response on successful deletion
+     */
+    @DeleteMapping("/book/{bookId}")
     public ResponseEntity<Void> deleteReview(
             @PathVariable Long bookId,
             @AuthenticationPrincipal Jwt jwt) {
