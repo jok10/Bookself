@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Basic entity representing a book on a shelf.
- * Skeleton only - fields/validation will be fleshed out in later hand-ins.
+ * Represents a book in the system.
+ * Contains book details, average rating and user reviews.
  */
 @Entity
 @Getter
@@ -39,18 +39,31 @@ public class Book {
     private String description;
 
     @Column
-    private String genre; //Maybe an Enum with specific genre types?
+    private String genre;
 
     @Column
     private double avgRating;
 
+    /**
+     * List of reviews associated with this book.
+     * Connected via the 'book' field in the Review entity to avoid extra join tables.
+     * If a book is deleted, all its reviews are automatically removed.
+     */
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    //A single book can have many Reviews.
-    // mappedBy = book  tells jpa that this is connected to the Book book in review. So JPA doesnt make en extra join table for this but looks inside the Review to see how they are linked.
-    //cascade = CascadeType.ALL means that if a new book is added to the database the reviews are added as well. And if the book is deleted the reviews are also deleted.
     private List<Review> reviews = new ArrayList<>();
 
 
+    /**
+     * Constructor that creates a new book with the specified details.
+     * Used when admins add a new book to inventory where the book has no rating or reviews.
+     *
+     * @param title the title of the book
+     * @param author the author of the book
+     * @param year the publication year
+     * @param isbn the unique ISBN identifier
+     * @param description a summary or description of the book
+     * @param genre the genre of the book
+     */
     public Book(String title, String author, int year, String isbn, String description, String genre){
         this.title = title;
         this.author = author;
