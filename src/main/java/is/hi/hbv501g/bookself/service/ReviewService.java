@@ -10,4 +10,5 @@ public interface ReviewService {
     List<ReviewResponseDTO> getReviewsByBook(Long bookId);
     ReviewResponseDTO addOrUpdateReview(Long userId, Long bookId, double rating, String text);
     Page<ReviewResponseDTO> getPaginatedReviews(Long bookId, int page, int size);
+    void deleteReview(Long userId, Long bookId);
 }
