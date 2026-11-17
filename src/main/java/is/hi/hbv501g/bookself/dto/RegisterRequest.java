@@ -7,6 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data Transfer Object (DTO) representing an incoming user registration request payload.
+ * Contains validation for username length, valid email formatting, and required passwords.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

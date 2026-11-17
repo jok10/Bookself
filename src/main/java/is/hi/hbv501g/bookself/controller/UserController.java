@@ -48,7 +48,7 @@ public class UserController {
         Long userId = ((Number) jwt.getClaim("userId")).longValue();
         User currentUser = userService.getUserById(userId);
         return ResponseEntity.ok(
-                UserResponseDTO.fromFromEntity(currentUser));
+                UserResponseDTO.fromEntity(currentUser));
     }
 
     /**
@@ -71,7 +71,7 @@ public class UserController {
                 request.getEmail());
 
         return ResponseEntity.ok(
-                UserResponseDTO.fromFromEntity(updatedUser));
+                UserResponseDTO.fromEntity(updatedUser));
     }
 
     /**

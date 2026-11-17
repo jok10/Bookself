@@ -17,7 +17,13 @@ public class UserResponseDTO {
     private String email;
     private User.Role role;
 
-    public static UserResponseDTO fromFromEntity(User user){
+    /**
+     * Converta a User entity into a UserResponseDTO.
+     *
+     * @param user the User entity to convert
+     * @return a new UserResponseDTO with safe public user details
+     */
+    public static UserResponseDTO fromEntity(User user){
         return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
     }
 }

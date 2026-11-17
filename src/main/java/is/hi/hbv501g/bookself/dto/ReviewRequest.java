@@ -5,6 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+/**
+ * Data Transfer Object (DTO) representing an incoming request payload
+ * for creating or updating a book review. Includes validation and boundaries
+ * for rating (0.0 to 5.0) and text length (1000 characters).
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

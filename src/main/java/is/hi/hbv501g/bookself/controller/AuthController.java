@@ -117,6 +117,6 @@ public class AuthController {
         User newAdmin = authService.registerAdmin(request.getUsername(), request.getEmail(), request.getPassword());
 
         URI location = URI.create("/api/users/" + newAdmin.getId());
-        return ResponseEntity.created(location).body(UserResponseDTO.fromFromEntity(newAdmin));
+        return ResponseEntity.created(location).body(UserResponseDTO.fromEntity(newAdmin));
     }
 }
