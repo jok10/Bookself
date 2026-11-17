@@ -5,8 +5,19 @@ import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.repository.BookshelfRepository;
 import is.hi.hbv501g.bookself.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import is.hi.hbv501g.bookself.dto.ImgBBResponseDTO;
+import is.hi.hbv501g.bookself.dto.ImgBBData;
+
 
 @Service //Segir spring að búa til og halda utan um þennan klasa
 public class UserServiceImpl implements UserService { //lofar að implementa allt sem að er í userService
@@ -69,7 +80,46 @@ public class UserServiceImpl implements UserService { //lofar að implementa all
         userRepository.deleteById(id);
     }
 
-    /* Implement later
-    String updateProfilePicture(Long id, byte[] imageBytes);
-     */
+    @Override
+    public String updateProfilePicture(Long id, MultipartFile file){
+        User user = getUserById(id);
+
+        String imgbbApiKey = "72194c793c4de582744e1bbe61bfe6b4";
+
+        //Þurfum að vera með headers til að senda á imgBB API.
+        HttpHeaders headers = new HttpHeaders();
+        //Segir imgBB að við séum að senda inn file til að uploada.
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        //Pakka file inn í request body.
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("image", file.getResource());
+        //Pakka headers og body inn til að senda.
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        //Innbyggt inn í Spring til að senda HTTP request á web service.
+        RestTemplate restTemplate = new RestTemplate();
+
+        //ImgBB endpoint og API
+        String uploadUrl = "https://api.imgbb.com/1/upload?key=" + imgbbApiKey;
+
+        //Sendir HTTP POST á ImgBB
+        ResponseEntity<ImgBBResponseDTO> response = restTemplate.postForEntity(
+                uploadUrl,
+                requestEntity,
+                ImgBBResponseDTO.class
+        );
+
+        if (response.getBody() == null || response.getBody().getData() == null) {
+            throw new RuntimeException("Failed to upload profile picture to ImgBB.");
+        }
+
+        String imageUrl = response.getBody().getData().getLink();
+
+        user.setProfilePicURL(imageUrl);
+        userRepository.save(user);
+
+        return imageUrl;
+
+
+    }
+
 }
