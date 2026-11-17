@@ -1,16 +1,17 @@
 package is.hi.hbv501g.bookself.model;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity // Segir spring þetta sé klasi í SQL database.
-@Table(name = "users") //Til að segja að hér eru users geymdir. Má ekki vera user því það er reserved heiti
-@Data //Býr til getters, setters, toString() og ýmislegt annað automatically.
-@NoArgsConstructor //Býr til no ARgs constructor
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
+@ToString(exclude = "reviews")
+@EqualsAndHashCode(of = "id")
+@NoArgsConstructor
 @AllArgsConstructor
 public class User {
     @Id //Segir að þetta sér primary key í töflunni

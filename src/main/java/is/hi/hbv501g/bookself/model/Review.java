@@ -2,14 +2,15 @@ package is.hi.hbv501g.bookself.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"book", "user"}) // Exclude relationships to prevent toString loops
+@EqualsAndHashCode(of = "id") // Anchor equals/hashCode to the ID
 @NoArgsConstructor
 @AllArgsConstructor
 public class Review {

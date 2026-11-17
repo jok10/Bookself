@@ -1,9 +1,7 @@
 package is.hi.hbv501g.bookself.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +11,10 @@ import java.util.List;
  * Skeleton only - fields/validation will be fleshed out in later hand-ins.
  */
 @Entity
-@Data
+@Getter
+@Setter
+@ToString(exclude = "reviews")
+@EqualsAndHashCode(of = "isbn")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Book {
