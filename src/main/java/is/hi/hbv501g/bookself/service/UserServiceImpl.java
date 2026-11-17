@@ -4,6 +4,7 @@ package is.hi.hbv501g.bookself.service;
 import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.repository.BookshelfRepository;
 import is.hi.hbv501g.bookself.repository.UserRepository;
+import is.hi.hbv501g.bookself.utilities.UsageStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -78,30 +79,29 @@ public class UserServiceImpl implements UserService { //lofar að implementa all
         // The bookshelf points at the user, so it has to be deleted first or the database blocks the delete.
         bookshelfRepository.findByUserId(id).ifPresent(bookshelfRepository::delete);
         userRepository.deleteById(id);
+        UsageStatistics.getInstance().decrementTotalUsers();
     }
 
+    //When writing this code, AI was used to understand how things work
     @Override
     public String updateProfilePicture(Long id, MultipartFile file){
         User user = getUserById(id);
 
         String imgbbApiKey = "72194c793c4de582744e1bbe61bfe6b4";
 
-        //Þurfum að vera með headers til að senda á imgBB API.
+        //Headers to send to imgBB.
         HttpHeaders headers = new HttpHeaders();
-        //Segir imgBB að við séum að senda inn file til að uploada.
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        //Pakka file inn í request body.
+        // Wrap the content file into the request body. The actual image data.
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("image", file.getResource());
-        //Pakka headers og body inn til að senda.
+        //Wrap the headers and the body into a HTTP request to send to imBB.
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-        //Innbyggt inn í Spring til að senda HTTP request á web service.
+        //Built into Spring and used to send requests to other web services.
         RestTemplate restTemplate = new RestTemplate();
-
-        //ImgBB endpoint og API
+        //ImgBB endpoint and our API. This is the target endpoint.
         String uploadUrl = "https://api.imgbb.com/1/upload?key=" + imgbbApiKey;
-
-        //Sendir HTTP POST á ImgBB
+        //Send a HTTP POST to imgBB. ImgBB sends a bunch of info back but we just want the link. Response is sent to the DTO where the link is extracted.
         ResponseEntity<ImgBBResponseDTO> response = restTemplate.postForEntity(
                 uploadUrl,
                 requestEntity,
@@ -111,7 +111,6 @@ public class UserServiceImpl implements UserService { //lofar að implementa all
         if (response.getBody() == null || response.getBody().getData() == null) {
             throw new RuntimeException("Failed to upload profile picture to ImgBB.");
         }
-
         String imageUrl = response.getBody().getData().getLink();
 
         user.setProfilePicURL(imageUrl);

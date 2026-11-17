@@ -69,9 +69,6 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-//    public ResponseEntity<String> uploadProfilePic(Long userId, byte[] imageBytes) {
-//    }
-
     @DeleteMapping("/profile")
     public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal Jwt jwt) {
         Long userId = ((Number) jwt.getClaim("userId")).longValue();
