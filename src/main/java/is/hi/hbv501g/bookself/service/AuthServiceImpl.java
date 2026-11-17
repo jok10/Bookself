@@ -2,6 +2,7 @@ package is.hi.hbv501g.bookself.service;
 
 import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.repository.UserRepository;
+import is.hi.hbv501g.bookself.utilities.UsageStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -50,14 +51,16 @@ public class AuthServiceImpl implements AuthService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email '" + email + "' is already registered.");
         }
 
-        //Hugsanlega setja eitthvað um að athuga hvort að password sé nógu gott.
-
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         user.setRole(role);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        UsageStatistics.getInstance().incrementTotalUsers();
+
+        return  savedUser;
     }
 
     @Override

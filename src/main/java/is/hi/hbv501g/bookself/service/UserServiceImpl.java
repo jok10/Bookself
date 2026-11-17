@@ -4,6 +4,7 @@ package is.hi.hbv501g.bookself.service;
 import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.repository.BookshelfRepository;
 import is.hi.hbv501g.bookself.repository.UserRepository;
+import is.hi.hbv501g.bookself.utilities.UsageStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -78,6 +79,7 @@ public class UserServiceImpl implements UserService { //lofar að implementa all
         // The bookshelf points at the user, so it has to be deleted first or the database blocks the delete.
         bookshelfRepository.findByUserId(id).ifPresent(bookshelfRepository::delete);
         userRepository.deleteById(id);
+        UsageStatistics.getInstance().decrementTotalUsers();
     }
 
     //When writing this code, AI was used to understand how things work
