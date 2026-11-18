@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- *
+ * Implementation of the BookshelfService interface for managing user bookshelves.
  */
 @Service
 public class BookshelfServiceImpl implements BookshelfService {

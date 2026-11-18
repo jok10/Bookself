@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * Implementation of the AuthService interface for managing user registration and authentication.
+ */
 @Service
 public class AuthServiceImpl implements AuthService {
 
