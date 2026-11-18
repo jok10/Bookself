@@ -6,11 +6,41 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository //Segir spring að þetta se "Data Access Component"
+/**
+ * Repository for database operations on Users.
+ */
+@Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    //innbyggt er findById Save og ýmislegt annað
+
+    /**
+     * Finds a user by their username.
+     *
+     * @param username the username to search for
+     * @return an Optional containing the user if found
+     */
     Optional<User> findByUsername(String username);
+
+    /**
+     * Finds a user by their email address.
+     *
+     * @param email the email address to search for
+     * @return an Optional containing the user if found
+     */
     Optional<User> findByEmail(String email);
-    boolean existsByUsername(String username); //Til að athuga hvort að þetta usedrname sé í notkun
-    boolean existsByEmail(String email); //Til að athuga hvort að þetta emeil sé í notkun.
+
+    /**
+     * Checks if a username is already in use.
+     *
+     * @param username the username to check
+     * @return true if the username exists, false otherwise
+     */
+    boolean existsByUsername(String username);
+
+    /**
+     * Checks if an email address is already in use.
+     *
+     * @param email the email to check
+     * @return true if the email exists, false otherwise
+     */
+    boolean existsByEmail(String email);
 }

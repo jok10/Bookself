@@ -15,15 +15,32 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+/**
+ * Configuration class for Spring Security, password encoding,
+ * HTTP security filter chains, and authentication management.
+ */
 @Configuration
 public class SecurityConfig {
 
+    /**
+     * Defines the password encoder bean using delegating password encoding.
+     *
+     * @return the PasswordEncoder instance
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories
                 .createDelegatingPasswordEncoder();
     }
 
+    /**
+     * Configures the security filter chain for HTTP requests, setting up stateless
+     * JWT sessions, disabling CSRF, and defining public and protected endpoints.
+     *
+     * @param http the HttpSecurity configuration object
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http) throws Exception {
@@ -41,6 +58,13 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Creates the AuthenticationManager bean for handling user login authentication.
+     *
+     * @param users the UserDetailsService for loading user data
+     * @param encoder the password encoder for verifying credentials
+     * @return the configured AuthenticationManager
+     */
     @Bean
     AuthenticationManager authenticationManager(
             UserDetailsService users,

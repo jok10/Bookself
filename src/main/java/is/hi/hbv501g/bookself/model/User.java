@@ -1,19 +1,20 @@
 package is.hi.hbv501g.bookself.model;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity // Segir spring þetta sé klasi í SQL database.
-@Table(name = "users") //Til að segja að hér eru users geymdir. Má ekki vera user því það er reserved heiti
-@Data //Býr til getters, setters, toString() og ýmislegt annað automatically.
-@NoArgsConstructor //Býr til no ARgs constructor
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
+@ToString(exclude = "reviews")
+@EqualsAndHashCode(of = "id")
+@NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    @Id //Segir að þetta sér primary key í töflunni
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //Segir að þetta sé autoincremented ids
     private Long id;
 
@@ -26,6 +27,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    /**
+     * Defines the authorization roles of users.
+     */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -39,6 +43,14 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
 
+    /**
+     * Constructor that creates a new user with the specified account details and role.
+     *
+     * @param username the unique username
+     * @param email the unique email address
+     * @param password the hashed user password
+     * @param role the security role assigned to the user
+     */
     public User(String username, String email, String password, Role role){
         this.username = username;
         this.email = email;
@@ -46,6 +58,11 @@ public class User {
         this.role = role;
     }
 
+    /**
+     * Checks whether the user has admin privileges.
+     *
+     * @return true if the user role is ADMIN, false otherwise
+     */
     public boolean isAdmin(){
         return Role.ADMIN.equals(this.role);
     }

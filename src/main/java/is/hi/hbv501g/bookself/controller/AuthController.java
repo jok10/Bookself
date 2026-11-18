@@ -21,9 +21,12 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import java.net.URI;
 
-
-@RestController //This class handles HTTP endpoints and will return data directly.
-@RequestMapping("/api/auth") //Sets the base URL path for all endpoints in this class.
+/**
+ * REST controller responsible for handling authentication, user registration,
+ * admi account creation, and user logout endpoints under the "/api/auth" path.
+ */
+@RestController
+@RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
@@ -38,6 +41,14 @@ public class AuthController {
         this.tokenService = tokenService;
     }
 
+    //Login user
+
+    /**
+     * Authenticates a user with their username and password.
+     *
+     * @param request the login request containing username and password
+     * @return a TokenResponse containing the generated JWT token and its expiration time
+     */
     @PostMapping("/login")
     public TokenResponse login(@Valid @RequestBody LoginRequest request) {
         Authentication auth =
@@ -49,12 +60,25 @@ public class AuthController {
     }
 
     // Logout user
+    /**
+     * Handles user logout.
+     *
+     * @return a success response message
+     */
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser() {
         return ResponseEntity.ok("Logged out successfully.");
     }
 
-    //Register User
+    //Registration
+
+    /**
+     * Registers a new user and issues an authentication token.
+     *
+     * @param request the registration request with username, email, and password
+     * @return a TokenResponse containing the user's JWT token for immediate login
+     */
+
     @PostMapping("/register")
     public TokenResponse registerUser(@Valid @RequestBody RegisterRequest request) {
 
@@ -71,6 +95,14 @@ public class AuthController {
         return new TokenResponse(tokenService.createToken(auth), 3600);
     }
 
+    /**
+     * Registers a new administrative user. Only currently authenticated admins can invoke method.
+     *
+     * @param request the registration request for the new admin account
+     * @param jwt token from the currently logged-in user
+     * @return a 201 Created response containing the created admin's user details
+     */
+
     @PostMapping("/register-admin")
     public ResponseEntity<UserResponseDTO> registerAdmin(
             @Valid @RequestBody RegisterRequest request, @AuthenticationPrincipal Jwt jwt) {
@@ -85,6 +117,6 @@ public class AuthController {
         User newAdmin = authService.registerAdmin(request.getUsername(), request.getEmail(), request.getPassword());
 
         URI location = URI.create("/api/users/" + newAdmin.getId());
-        return ResponseEntity.created(location).body(UserResponseDTO.fromFromEntity(newAdmin));
+        return ResponseEntity.created(location).body(UserResponseDTO.fromEntity(newAdmin));
     }
 }

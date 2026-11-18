@@ -1,9 +1,7 @@
 package is.hi.hbv501g.bookself.controller;
 
-import is.hi.hbv501g.bookself.model.Book;
 import is.hi.hbv501g.bookself.model.Bookshelf;
 import is.hi.hbv501g.bookself.model.User;
-import is.hi.hbv501g.bookself.service.BookService;
 import is.hi.hbv501g.bookself.service.BookshelfService;
 import is.hi.hbv501g.bookself.service.UserService;
 import is.hi.hbv501g.bookself.dto.UserResponseDTO;
@@ -15,9 +13,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 
+/**
+ * REST controller responsible for managing user profiles, account settings,
+ * profile pictures, administrative user listings, and personal bookshelf operations
+ * under the "/api/users" path.
+ */
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -30,6 +32,15 @@ public class UserController {
         this.bookshelfService = bookshelfService;
     }
 
+    //Profile Management
+
+    /**
+     * Retrieves the profile details of the currently authenticated user.
+     *
+     * @param jwt the security token of the logged-in user
+     * @return a ResponseEntity containing the user's UserResponseDTO.
+     */
+
     @GetMapping("/profile")
     public ResponseEntity<UserResponseDTO> getProfile(
             @AuthenticationPrincipal Jwt jwt) {
@@ -37,8 +48,16 @@ public class UserController {
         Long userId = ((Number) jwt.getClaim("userId")).longValue();
         User currentUser = userService.getUserById(userId);
         return ResponseEntity.ok(
-                UserResponseDTO.fromFromEntity(currentUser));
+                UserResponseDTO.fromEntity(currentUser));
     }
+
+    /**
+     * Updates the profile information (username and/or email) of the authenticated user.
+     *
+     * @param request the update request containing new profile details
+     * @param jwt the security token of the logged-in user
+     * @return a ResponseEntity containing the updated UserResponseDTO
+     */
 
     @PutMapping("/profile")
     public ResponseEntity<UserResponseDTO> updateProfile(
@@ -52,8 +71,16 @@ public class UserController {
                 request.getEmail());
 
         return ResponseEntity.ok(
-                UserResponseDTO.fromFromEntity(updatedUser));
+                UserResponseDTO.fromEntity(updatedUser));
     }
+
+    /**
+     * Uploads and updates the profile picture for the authenticated user.
+     *
+     * @param file the image file multipart upload
+     * @param jwt the security token of the logged-in user
+     * @return a ResponseEntity containing the URL path of the uploaded image
+     */
     @PostMapping("/profile-picture")
     public ResponseEntity<String> uploadProfilePicture(
             @RequestParam("file") MultipartFile file,
@@ -63,11 +90,12 @@ public class UserController {
         return ResponseEntity.ok(imageUrl);
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = (List<User>) userService.getAllUsers();
-        return ResponseEntity.ok(users);
-    }
+    /**
+     * Deletes the user account and associated data for the currently authenticated user.
+     *
+     * @param jwt the security token of the logged-in user
+     * @return a 204 No Content response on successful account deletion
+     */
 
     @DeleteMapping("/profile")
     public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal Jwt jwt) {
@@ -76,6 +104,20 @@ public class UserController {
         userService.deleteUserAccount(currentUser.getId());
         return ResponseEntity.noContent().build();
     }
+
+    //User administration
+
+    /**
+     * Retrieves a list of all users registered in the system.
+     *
+     * @return a ResponseEntity containing a list of User entities
+     */
+    @GetMapping("/all")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = (List<User>) userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
 
     @GetMapping("/bookshelf")
     public ResponseEntity<Bookshelf> getUserBookshelf(@AuthenticationPrincipal Jwt jwt) {
@@ -90,6 +132,15 @@ public class UserController {
         }
     }
 
+    //Bookshelf Management
+
+    /**
+     * Retrieves the bookshelf that belongs to the currently authenticated user.
+     *
+     * @param jwt the security token of the logged-in user
+     * @return a ResponseEntity containing the Bookshelf object, or 404 Not Found if it doesn't exist
+     */
+
     @PostMapping("/bookshelf/add")
     public ResponseEntity<Bookshelf> addBookToBookshelf(
             @RequestParam Long bookId, @AuthenticationPrincipal Jwt jwt) {
@@ -99,6 +150,14 @@ public class UserController {
         Bookshelf updatedBookshelf = bookshelfService.addBookToShelf(currentUser.getId(), bookId);
         return ResponseEntity.ok(updatedBookshelf);
     }
+
+    /**
+     * Adds a specific book to the authenticated user's bookshelf.
+     *
+     * @param bookId the unique id of the book to add
+     * @param jwt the security token of the logged-in user
+     * @return a ResponseEntity containing the updated Bookshelf object
+     */
 
     @DeleteMapping("/bookshelf/remove")
     public ResponseEntity<Bookshelf> removeBookFromBookshelf(

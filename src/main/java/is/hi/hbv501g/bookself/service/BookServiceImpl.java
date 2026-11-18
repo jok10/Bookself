@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
+/**
+ * Implementation of the BookService interface for managing books.
+ */
 @Service
 public class BookServiceImpl implements BookService {
 

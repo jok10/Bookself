@@ -5,7 +5,9 @@ import lombok.Data;
 
 
 /**
- * The root JSON response that imgBB API returns when an image has been uploaded. Response from imgBB is nested and the data is mapped to ImgBBData DTO
+ * Data Transfer Object (DTO) representing the root JSON response
+ * returned by the imgBB API after a successful image upload.
+ * Maps the nested response payload to the ImgBBData DTO.
  */
 @Data
 @JsonIgnoreProperties (ignoreUnknown = true) //Ignora allt sem ivið þurfum ekki. Þurfum bara linkinn.

@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of the ReviewService interface for managing book reviews, ratings, and score calculations.
+ */
 @Service
 public class ReviewServiceImpl implements ReviewService{
 
@@ -56,10 +59,10 @@ public class ReviewServiceImpl implements ReviewService{
     @Transactional
     public ReviewResponseDTO addOrUpdateReview(Long userId, Long bookId, double rating, String text) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + userId));
 
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + bookId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with ID: " + bookId));
 
         Optional<Review> existingReview = reviewRepository.findByUserIdAndBookId(userId, bookId);
 
@@ -85,7 +88,7 @@ public class ReviewServiceImpl implements ReviewService{
 
     private void updateBookAverageRating(Long bookId) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("Book not found with ID: " + bookId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with ID: " + bookId));
 
         List<Review> reviews = reviewRepository.findByBookId(bookId);
 

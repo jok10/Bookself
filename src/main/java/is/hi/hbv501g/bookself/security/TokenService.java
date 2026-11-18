@@ -14,6 +14,9 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+/**
+ * Service for generating JSON Web Tokens (JWT) for authenticated users.
+ */
 @Service
 public class TokenService {
 
@@ -49,6 +52,14 @@ public class TokenService {
 //                .encode(JwtEncoderParameters.from(header, claims))
 //                .getTokenValue();
 //    }
+
+/**
+ * Generates a signed JWT token for an authenticated user, with their roles and user ID.
+ *
+ * @param auth the authentication object containing user details
+ * @return a serialized JWT token string
+ **/
+
     public String createToken(Authentication auth) {
 
         Instant now = Instant.now();

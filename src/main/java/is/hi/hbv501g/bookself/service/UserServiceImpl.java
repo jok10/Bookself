@@ -6,10 +6,7 @@ import is.hi.hbv501g.bookself.repository.BookshelfRepository;
 import is.hi.hbv501g.bookself.repository.UserRepository;
 import is.hi.hbv501g.bookself.utilities.UsageStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -17,16 +14,19 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import is.hi.hbv501g.bookself.dto.ImgBBResponseDTO;
-import is.hi.hbv501g.bookself.dto.ImgBBData;
+import org.springframework.web.server.ResponseStatusException;
 
 
-@Service //Segir spring að búa til og halda utan um þennan klasa
-public class UserServiceImpl implements UserService { //lofar að implementa allt sem að er í userService
-    private final UserRepository userRepository; //unchangeable
+/**
+ * Implementation of the UserService interface for managing user accounts, profiles, and profile pictures.
+ */
+
+@Service
+public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
     private final BookshelfRepository bookshelfRepository;
 
     @Autowired
-    // segir spring að finna UserRepo og setja það inn í þennan constructor strax í byrjun
     public UserServiceImpl(UserRepository userRepository, BookshelfRepository bookshelfRepository) {
         this.userRepository = userRepository;
         this.bookshelfRepository = bookshelfRepository;
@@ -34,16 +34,17 @@ public class UserServiceImpl implements UserService { //lofar að implementa all
 
     @Override
     public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id));
+
     }
     @Override
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() ->
-                        new RuntimeException(
-                                "User not found with username: " + username));
-    }
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with username: " + username));
+        }
 
+    @Override
     public Iterable<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -55,14 +56,14 @@ public class UserServiceImpl implements UserService { //lofar að implementa all
         userRepository.findByUsername(username)
                 .ifPresent(existingUser -> {
                     if (!existingUser.getId().equals(id)) {
-                        throw new RuntimeException("Username already exists, please choose another one.");
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists.");
                     }
                 });
 
         userRepository.findByEmail(email)
                 .ifPresent(existingUser -> {
                     if (!existingUser.getId().equals(id)) {
-                        throw new RuntimeException("There is already an account with this e-mail.");
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "There is already an account with this e-mail.");
                     }
                 });
 
@@ -109,7 +110,7 @@ public class UserServiceImpl implements UserService { //lofar að implementa all
         );
 
         if (response.getBody() == null || response.getBody().getData() == null) {
-            throw new RuntimeException("Failed to upload profile picture to ImgBB.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload profile picture to ImgBB.");
         }
         String imageUrl = response.getBody().getData().getLink();
 

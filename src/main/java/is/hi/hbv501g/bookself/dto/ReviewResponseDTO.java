@@ -1,13 +1,15 @@
 package is.hi.hbv501g.bookself.dto;
 
-import is.hi.hbv501g.bookself.model.Book;
 import is.hi.hbv501g.bookself.model.Review;
-import is.hi.hbv501g.bookself.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
+
+/**
+ * Data Transfer Object (DTO) representing the outgoing response payload
+ * for a book review, including associated book and user details.
+ */
 
 @Data
 @NoArgsConstructor
@@ -22,6 +24,13 @@ public class ReviewResponseDTO {
     private double rating;
     private LocalDateTime createdAt;
 
+
+    /**
+     * Converts a Review entity into a ReviewResponseDTO.
+     *
+     * @param review the Review entity to convert
+     * @return a new ReviewResponseDTO with review details, book info, and user info
+     */
     public static ReviewResponseDTO fromEntity(Review review) {
         return new ReviewResponseDTO(
                 review.getId(),

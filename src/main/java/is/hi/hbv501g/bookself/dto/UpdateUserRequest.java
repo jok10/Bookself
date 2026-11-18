@@ -7,6 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data Transfer Object (DTO) representing an incoming request payload
+ * for updating user profile details (username and email) and validation checks.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
