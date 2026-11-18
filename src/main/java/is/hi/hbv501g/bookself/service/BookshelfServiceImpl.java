@@ -1,17 +1,13 @@
 package is.hi.hbv501g.bookself.service;
 
-import is.hi.hbv501g.bookself.model.Book;
 import is.hi.hbv501g.bookself.model.Bookshelf;
 import is.hi.hbv501g.bookself.repository.BookRepository;
 import is.hi.hbv501g.bookself.repository.BookshelfRepository;
 import is.hi.hbv501g.bookself.repository.UserRepository;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Implementation of the BookshelfService interface for managing user bookshelves.
@@ -29,28 +25,30 @@ public class BookshelfServiceImpl implements BookshelfService {
         this.userRepository = userRepo;
     }
 
+    @Override
     public Bookshelf getUserBookshelf(Long userId) {
         return bookshelfRepository.findByUserId(userId).orElseGet(() -> {
             // If the user doesn't have a bookshelf, create one
             return userRepository.findById(userId).map(user -> {
                 Bookshelf newBookshelf = new Bookshelf(user);
                 return bookshelfRepository.save(newBookshelf);
-            }).orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+            }).orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "User not found."));
         });
     }
 
+    @Override
     public Bookshelf addBookToShelf(Long userId, Long bookId) {
         Bookshelf bookshelf = getUserBookshelf(userId);
 
-        //console logs until we decide on exception handling
         if (!bookRepository.existsById(bookId)) {
-            System.out.println("Book not found");
-            return bookshelf;
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Book not found.");
         }
 
         if (bookshelfRepository.existsByUser_IdAndBooks_Id(userId, bookId)) {
-            System.out.println("Book is already in the user's bookshelf");
-            return bookshelf;
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "Book is already in the user's bookshelf.");
         }
 
         bookRepository.findById(bookId).ifPresent(book -> {
@@ -60,18 +58,18 @@ public class BookshelfServiceImpl implements BookshelfService {
         return bookshelf;
     }
 
+    @Override
     public Bookshelf removeBookFromShelf(Long userId, Long bookId) {
         Bookshelf bookshelf = getUserBookshelf(userId);
 
-        //console logs until we decide on exception handling
         if (!bookRepository.existsById(bookId)) {
-            System.out.println("Book not found");
-            return bookshelf;
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Book not found.");
         }
 
         if (!bookshelfRepository.existsByUser_IdAndBooks_Id(userId, bookId)) {
-            System.out.println("Book is not in the user's bookshelf");
-            return bookshelf;
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Book is not in the user's bookshelf.");
         }
 
         bookRepository.findById(bookId).ifPresent(book -> {
