@@ -3,6 +3,8 @@ package is.hi.hbv501g.bookself.service;
 import is.hi.hbv501g.bookself.model.User;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * Service interface for managing user accounts, profiles, and profile pictures.
  */
@@ -25,11 +27,11 @@ public interface UserService {
     User getUserByUsername(String username);
 
     /**
-     * Retrieves all users in the system.
+     * Retrieves a list of all users registered in the system.
      *
-     * @return an iterable collection of all User entities
+     * @return a ResponseEntity containing a list of UserResponseDTO objects
      */
-    Iterable<User> getAllUsers();
+    List<User> getAllUsers();
 
     /**
      * Updates an existing user's profile information (username and email).

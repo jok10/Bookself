@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import is.hi.hbv501g.bookself.dto.ImgBBResponseDTO;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 
 /**
  * Implementation of the UserService interface for managing user accounts, profiles, and profile pictures.
@@ -45,7 +47,7 @@ public class UserServiceImpl implements UserService {
         }
 
     @Override
-    public Iterable<User> getAllUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
