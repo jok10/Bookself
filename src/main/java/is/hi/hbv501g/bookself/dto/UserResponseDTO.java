@@ -16,6 +16,7 @@ public class UserResponseDTO {
     private String username;
     private String email;
     private User.Role role;
+    private String profilePicURL;
 
     /**
      * Converta a User entity into a UserResponseDTO.
@@ -24,6 +25,6 @@ public class UserResponseDTO {
      * @return a new UserResponseDTO with safe public user details
      */
     public static UserResponseDTO fromEntity(User user){
-        return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+        return new UserResponseDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole(), user.getProfilePicURL());
     }
 }

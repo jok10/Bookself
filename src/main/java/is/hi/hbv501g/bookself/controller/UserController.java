@@ -93,6 +93,7 @@ public class UserController {
         return ResponseEntity.ok(imageUrl);
     }
 
+
     /**
      * Deletes the user account and associated data for the currently authenticated user.
      *
