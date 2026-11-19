@@ -9,11 +9,13 @@ import is.hi.hbv501g.bookself.dto.UserResponseDTO;
 import is.hi.hbv501g.bookself.dto.UpdateUserRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -91,6 +93,7 @@ public class UserController {
         return ResponseEntity.ok(imageUrl);
     }
 
+
     /**
      * Deletes the user account and associated data for the currently authenticated user.
      *
@@ -115,7 +118,15 @@ public class UserController {
      * @return a ResponseEntity containing a list of UserResponseDTO objects
      */
     @GetMapping("/all")
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers(@AuthenticationPrincipal Jwt jwt) {
+        Long userId = ((Number) jwt.getClaim("userId")).longValue();
+        User currentUser = userService.getUserById(userId);
+
+        if (!currentUser.isAdmin()) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Admin access required.");
+        }
         List<UserResponseDTO> users =
                 userService.getAllUsers()
                         .stream()

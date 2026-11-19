@@ -1,6 +1,6 @@
 package is.hi.hbv501g.bookself.service;
 
-
+import is.hi.hbv501g.bookself.dto.ImgBBResponseDTO;
 import is.hi.hbv501g.bookself.model.User;
 import is.hi.hbv501g.bookself.repository.BookshelfRepository;
 import is.hi.hbv501g.bookself.repository.UserRepository;
@@ -13,8 +13,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import is.hi.hbv501g.bookself.dto.ImgBBResponseDTO;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -28,6 +28,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BookshelfRepository bookshelfRepository;
 
+    @Value("${imgbb.api.key}")
+    private String imgbbApiKey;
+
     @Autowired
     public UserServiceImpl(UserRepository userRepository, BookshelfRepository bookshelfRepository) {
         this.userRepository = userRepository;
@@ -39,12 +42,13 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with id: " + id));
 
     }
+
     @Override
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() ->
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with username: " + username));
-        }
+    }
 
     @Override
     public List<User> getAllUsers() {
@@ -87,10 +91,8 @@ public class UserServiceImpl implements UserService {
 
     //When writing this code, AI was used to understand how things work
     @Override
-    public String updateProfilePicture(Long id, MultipartFile file){
+    public String updateProfilePicture(Long id, MultipartFile file) {
         User user = getUserById(id);
-
-        String imgbbApiKey = "72194c793c4de582744e1bbe61bfe6b4";
 
         //Headers to send to imgBB.
         HttpHeaders headers = new HttpHeaders();
@@ -114,7 +116,7 @@ public class UserServiceImpl implements UserService {
         if (response.getBody() == null || response.getBody().getData() == null) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload profile picture to ImgBB.");
         }
-        String imageUrl = response.getBody().getData().getLink();
+        String imageUrl = response.getBody().getData().getUrl();
 
         user.setProfilePicURL(imageUrl);
         userRepository.save(user);

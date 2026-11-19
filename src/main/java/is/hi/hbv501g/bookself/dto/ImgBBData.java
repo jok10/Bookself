@@ -11,5 +11,5 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ImgBBData {
-    private String link;
+    private String url;
 }
