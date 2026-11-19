@@ -247,10 +247,9 @@ The API will be available at:
 ```text
 http://localhost:8080
 ```
-x
 
-If not running locally, the deployed API can be accessed through:
-https://bookself-otqw.onrender.com
+If not running locally, the deployed API is available at `https://bookself-otqw.onrender.com`.
+
 ---
 
 ## Example Login Request
