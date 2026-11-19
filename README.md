@@ -221,7 +221,7 @@ The custom `userId` claim is used for ownership validation and user-specific ope
 
 ### Environment Variables
 
-The following environment variables must be configured before running the application:
+The following environment variables must be configured before running the application loca:
 
 ```text
 pgusername=<database_username>
@@ -247,7 +247,10 @@ The API will be available at:
 ```text
 http://localhost:8080
 ```
+x
 
+If not running locally, the deployed API can be accessed through:
+https://bookself-otqw.onrender.com
 ---
 
 ## Example Login Request
@@ -260,8 +263,8 @@ POST /api/auth/login
 
 ```json
 {
-  "username": "user1",
-  "password": "password123"
+  "username": "ilovebooks",
+  "password": "12345"
 }
 ```
 
